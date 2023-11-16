@@ -4,6 +4,7 @@ namespace Casbin\Tests;
 
 use Casbin\EnforceContext;
 use Casbin\Enforcer;
+use Casbin\Log\Log;
 use Casbin\Model\Model;
 use Casbin\Persist\Adapters\FileAdapter;
 use Casbin\Util\BuiltinOperations;
@@ -466,6 +467,7 @@ class EnforcerTest extends TestCase
      */
     public function testRbacWithDomain($user, $domain, $resource, $action, $expected)
     {
+        Log::getLogger()->enableLog(true);
         $enforcer = new Enforcer(
             $this->modelAndPolicyPath . '/rbac_with_domain_pattern_model_and_keymatch_model.conf',
             $this->modelAndPolicyPath . '/rbac_with_domain_pattern_model_and_keymatch_policy.csv'
@@ -473,6 +475,9 @@ class EnforcerTest extends TestCase
         $enforcer->addNamedDomainMatchingFunc('g', 'keyMatch', function (string $keyOne, string $keyTwo) {
             return BuiltinOperations::keyMatch($keyOne, $keyTwo);
         });
+
+        $aa = print_r($enforcer, true);
+
         $this->assertSame($expected, $enforcer->enforce($user, $domain, $resource, $action));
     }
 }
