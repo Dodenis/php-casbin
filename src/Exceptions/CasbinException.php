@@ -9,6 +9,4 @@ namespace Casbin\Exceptions;
  *
  * @author techlee@qq.com
  */
-class CasbinException extends \Exception
-{
-}
+class CasbinException extends \Exception {}

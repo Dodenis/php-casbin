@@ -2,52 +2,51 @@
 
 namespace Casbin\Tests\Unit;
 
-use Casbin\Exceptions\BatchOperationException;
 use PHPUnit\Framework\TestCase;
 use Casbin\Enforcer;
 use Casbin\Persist\Adapters\FileAdapter;
 use Casbin\Tests\Watcher\SampleWatcher;
 use Casbin\Tests\Watcher\SampleWatcherUpdatable;
-use Mockery;
 use Casbin\Exceptions\NotImplementedException;
 
 /**
  * ManagementEnforcerTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class ManagementEnforcerTest extends TestCase
 {
     private $modelAndPolicyPath = __DIR__ . '/../../examples';
 
-    public function testGetAllNamedSubjects()
+    public function testGetAllNamedSubjects(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $this->assertEquals(['alice', 'bob', 'data2_admin'], $e->getAllNamedSubjects('p'));
         $this->assertEquals([], $e->getAllNamedSubjects('g'));
     }
 
-
-    public function testGetAllNamedObjects()
+    public function testGetAllNamedObjects(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $this->assertEquals(['data1', 'data2'], $e->getAllNamedObjects('p'));
         $this->assertEquals([], $e->getAllNamedObjects('g'));
     }
 
-    public function testGetAllNamedActions()
+    public function testGetAllNamedActions(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $this->assertEquals(['read', 'write'], $e->getAllNamedActions('p'));
     }
 
-    public function testGetAllNamedRoles()
+    public function testGetAllNamedRoles(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $this->assertEquals(['data2_admin'], $e->getAllNamedRoles('g'));
     }
 
-    public function testGetList()
+    public function testGetList(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
 
@@ -57,7 +56,7 @@ class ManagementEnforcerTest extends TestCase
         $this->assertEquals($e->getAllRoles(), ['data2_admin']);
     }
 
-    public function testGetPolicyAPI()
+    public function testGetPolicyAPI(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
 
@@ -100,7 +99,7 @@ class ManagementEnforcerTest extends TestCase
         $this->assertFalse($e->hasGroupingPolicy(['bob', 'data2_admin']));
     }
 
-    public function testModifyPolicyAPI()
+    public function testModifyPolicyAPI(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
 
@@ -157,7 +156,7 @@ class ManagementEnforcerTest extends TestCase
         ]);
     }
 
-    public function testModifyGroupingPolicyAPI()
+    public function testModifyGroupingPolicyAPI(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
 
@@ -215,7 +214,7 @@ class ManagementEnforcerTest extends TestCase
         $this->assertEquals($e->getUsersForRole('data3_admin'), ['eve']);
     }
 
-    public function testUpdatePolicy()
+    public function testUpdatePolicy(): void
     {
         // p, alice, data1, read
         // p, bob, data2, write
@@ -235,7 +234,7 @@ class ManagementEnforcerTest extends TestCase
         $this->assertTrue($e->hasPolicy('alice', 'data1', 'write'));
     }
 
-    public function testUpdatePolicies()
+    public function testUpdatePolicies(): void
     {
         // p, alice, data1, read
         // p, bob, data2, write
@@ -255,14 +254,14 @@ class ManagementEnforcerTest extends TestCase
 
         $oldPolicies = [
             ['alice', 'data1', 'read'],
-            ['bob', 'data2', 'write']
+            ['bob', 'data2', 'write'],
         ];
         $newPolicies = [
             ['alice', 'data1', 'write'],
-            ['bob', 'data2', 'read']
+            ['bob', 'data2', 'read'],
         ];
         $e->updatePolicies($newPolicies, $oldPolicies);
-        $watcherUpdatable->setUpdateCallback(function () {
+        $watcherUpdatable->setUpdateCallback(function (): void {
             throw new \Exception('');
         });
         $e->updatePolicies($oldPolicies, $newPolicies);
@@ -273,12 +272,11 @@ class ManagementEnforcerTest extends TestCase
         $this->assertTrue($e->hasPolicy('bob', 'data2', 'read'));
         $watcher = new SampleWatcher();
         $e->setWatcher($watcher);
-        $watcher->setUpdateCallback(function () {
-        });
+        $watcher->setUpdateCallback(function (): void {});
         $e->updatePolicies($newPolicies, $oldPolicies);
     }
 
-    public function testupdateFilteredPolicies()
+    public function testupdateFilteredPolicies(): void
     {
         // p, alice, data1, read
         // p, bob, data2, write
@@ -287,14 +285,14 @@ class ManagementEnforcerTest extends TestCase
         //
         // g, alice, data2_admin
 
-        $testAdapter = Mockery::mock(FileAdapter::class);
-        $model = Mockery::type("Casbin\Model\Model");
+        $testAdapter = \Mockery::mock(FileAdapter::class);
+        $model = \Mockery::type('Casbin\\Model\\Model');
         $testAdapter->shouldReceive('loadPolicy')->once()->with($model)->andReturn(null);
-    
+
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $testAdapter);
         $rules = [
             ['alice', 'data1', 'read'],
-            ['bob', 'data2', 'write']
+            ['bob', 'data2', 'write'],
         ];
 
         $testAdapter->shouldReceive('addPolicies')->once()->with('p', 'p', $rules)->andReturn(null);
@@ -302,8 +300,7 @@ class ManagementEnforcerTest extends TestCase
 
         $watcherUpdatable = new SampleWatcherUpdatable();
         $e->setWatcher($watcherUpdatable);
-        $watcherUpdatable->setUpdateCallback(function () {
-        });
+        $watcherUpdatable->setUpdateCallback(function (): void {});
 
         $this->assertTrue($e->hasPolicy('alice', 'data1', 'read'));
         $this->assertFalse($e->hasPolicy('alice', 'data1', 'write'));
@@ -322,29 +319,27 @@ class ManagementEnforcerTest extends TestCase
 
         $watcher = new SampleWatcher();
         $e->setWatcher($watcher);
-        $watcher->setUpdateCallback(function () {
-        });
-        
+        $watcher->setUpdateCallback(function (): void {});
+
         $testAdapter->shouldReceive('updateFilteredPolicies')->once()->with('p', 'p', [['alice', 'data1', 'read']], 0, 'alice', 'data1', 'write')->andReturn([['alice', 'data1', 'write']]);
         $e->updateFilteredPolicies([['alice', 'data1', 'read']], 0, 'alice', 'data1', 'write');
         $this->assertFalse($e->hasPolicy('alice', 'data1', 'write'));
         $this->assertTrue($e->hasPolicy('alice', 'data1', 'read'));
     }
 
-    public function testupdateFilteredPoliciesWithoutWatcher()
+    public function testupdateFilteredPoliciesWithoutWatcher(): void
     {
-        $testAdapter = Mockery::mock(FileAdapter::class);
-        $model = Mockery::type("Casbin\Model\Model");
+        $testAdapter = \Mockery::mock(FileAdapter::class);
+        $model = \Mockery::type('Casbin\\Model\\Model');
         $testAdapter->shouldReceive('loadPolicy')->once()->with($model)->andReturn(null);
-    
+
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $testAdapter);
         $rules = [
             ['alice', 'data1', 'read'],
         ];
         $testAdapter->shouldReceive('addPolicies')->once()->with('p', 'p', $rules)->andReturn(null);
-        
-        $e->addPolicies($rules);
 
+        $e->addPolicies($rules);
 
         $this->assertTrue($e->hasPolicy('alice', 'data1', 'read'));
         $this->assertFalse($e->hasPolicy('alice', 'data1', 'write'));

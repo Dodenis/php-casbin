@@ -10,12 +10,14 @@ use PHPUnit\Framework\TestCase;
  * FileAdapterTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class FileAdapterTest extends TestCase
 {
     private $modelAndPolicyPath = __DIR__ . '/../../../../examples';
 
-    public function testSavePolicy()
+    public function testSavePolicy(): void
     {
         $adapter = new FileAdapter(__DIR__ . '/basic_policy_test.csv');
         $m = new Model();

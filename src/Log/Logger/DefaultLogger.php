@@ -40,17 +40,12 @@ class DefaultLogger implements Logger
 
     /**
      * enableLog.
-     *
-     * @param bool $enable
      */
     public function enableLog(bool $enable): void
     {
         $this->enable = $enable;
     }
 
-    /**
-     * @return bool
-     */
     public function isEnabled(): bool
     {
         return $this->enable;
@@ -63,6 +58,7 @@ class DefaultLogger implements Logger
     {
         if ($this->enable) {
             $content = date('Y-m-d H:i:s ');
+
             foreach ($v as $value) {
                 if (\is_array($value)) {
                     $value = json_encode($value);
@@ -77,8 +73,7 @@ class DefaultLogger implements Logger
     }
 
     /**
-     * @param string $format
-     * @param mixed  ...$v
+     * @param mixed ...$v
      */
     public function writef(string $format, ...$v): void
     {
@@ -90,12 +85,9 @@ class DefaultLogger implements Logger
         }
     }
 
-    /**
-     * @param string $content
-     */
     public function save(string $content): void
     {
-        $file = $this->path.DIRECTORY_SEPARATOR.$this->name;
+        $file = $this->path . DIRECTORY_SEPARATOR . $this->name;
         file_put_contents($file, $content, FILE_APPEND | LOCK_EX);
     }
 }

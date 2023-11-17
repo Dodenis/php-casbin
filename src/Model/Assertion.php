@@ -45,7 +45,7 @@ class Assertion
     public $policy = [];
 
     /**
-     * $policyMap
+     * $policyMap.
      *
      * @var array<string, int>
      */
@@ -61,7 +61,7 @@ class Assertion
     /**
      * $priorityIndex.
      *
-     * @var int|bool
+     * @var bool|int
      */
     public $priorityIndex;
 
@@ -71,8 +71,6 @@ class Assertion
     }
 
     /**
-     * @param RoleManager $rm
-     *
      * @throws CasbinException
      */
     public function buildRoleLinks(RoleManager $rm): void
@@ -84,6 +82,7 @@ class Assertion
             if ($count < 2) {
                 throw new CasbinException('the number of "_" in role definition should be at least 2');
             }
+
             if (\count($rule) < $count) {
                 throw new CasbinException('grouping policy elements do not meet role definition');
             }
@@ -102,15 +101,13 @@ class Assertion
     }
 
     /**
-     * @param RoleManager $rm
-     * @param integer $op
      * @param string[][] $rules
-     * @return void
      */
     public function buildIncrementalRoleLinks(RoleManager $rm, int $op, array $rules): void
     {
         $this->rm = $rm;
         $count = substr_count($this->value, '_');
+
         if ($count < 2) {
             throw new CasbinException('the number of "_" in role definition should be at least 2');
         }
@@ -119,15 +116,19 @@ class Assertion
             if (\count($rule) < $count) {
                 throw new CasbinException('grouping policy elements do not meet role definition');
             }
+
             if (\count($rule) > $count) {
                 $rule = array_slice($rule, 0, $count);
             }
+
             switch ($op) {
                 case Policy::POLICY_ADD:
                     $rm->addLink($rule[0], $rule[1], ...array_slice($rule, 2));
+
                     break;
                 case Policy::POLICY_REMOVE:
                     $rm->deleteLink($rule[0], $rule[1], ...array_slice($rule, 2));
+
                     break;
             }
         }

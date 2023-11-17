@@ -14,8 +14,6 @@ interface BatchAdapter extends Adapter
      * Adds a policy rules to the storage.
      * This is part of the Auto-Save feature.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[][] $rules
      */
     public function addPolicies(string $sec, string $ptype, array $rules): void;
@@ -24,8 +22,6 @@ interface BatchAdapter extends Adapter
      * Removes policy rules from the storage.
      * This is part of the Auto-Save feature.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[][] $rules
      */
     public function removePolicies(string $sec, string $ptype, array $rules): void;

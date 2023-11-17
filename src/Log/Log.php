@@ -22,8 +22,6 @@ class Log
 
     /**
      * Sets the current logger.
-     *
-     * @param Logger $l
      */
     public static function setLogger(Logger $l): void
     {
@@ -32,8 +30,6 @@ class Log
 
     /**
      * Returns the current logger.
-     *
-     * @return Logger
      */
     public static function getLogger(): Logger
     {
@@ -53,8 +49,7 @@ class Log
     /**
      * Prints the log with the format.
      *
-     * @param string $format
-     * @param mixed  ...$v
+     * @param mixed ...$v
      */
     public static function logPrintf(string $format, ...$v): void
     {

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Casbin\Persist;
 
-use Closure;
-
 /**
  * Interface Watcher
  * The interface for Casbin watchers.
@@ -17,10 +15,8 @@ interface Watcher
     /**
      * Sets the callback function that the watcher will call when the policy in DB has been changed by other instances.
      * A classic callback is loadPolicy() method of Enforcer class.
-     *
-     * @param Closure $func
      */
-    public function setUpdateCallback(Closure $func): void;
+    public function setUpdateCallback(\Closure $func): void;
 
     /**
      * Update calls the update callback of other instances to synchronize their policy.

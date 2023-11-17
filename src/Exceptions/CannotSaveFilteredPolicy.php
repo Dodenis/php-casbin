@@ -9,6 +9,4 @@ namespace Casbin\Exceptions;
  *
  * @author techlee@qq.com
  */
-class CannotSaveFilteredPolicy extends CasbinException
-{
-}
+class CannotSaveFilteredPolicy extends CasbinException {}

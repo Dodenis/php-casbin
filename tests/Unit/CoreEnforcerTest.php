@@ -15,12 +15,14 @@ use PHPUnit\Framework\TestCase;
  * CoreEnforcerTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class CoreEnforcerTest extends TestCase
 {
     private $modelAndPolicyPath = __DIR__ . '/../../examples';
 
-    public function testInitWithEnableLog()
+    public function testInitWithEnableLog(): void
     {
         // The log is not enabled by default
         $e = new \Casbin\Enforcer($this->modelAndPolicyPath . '/basic_model.conf', $this->modelAndPolicyPath . '/basic_policy.csv', true);
@@ -32,7 +34,7 @@ class CoreEnforcerTest extends TestCase
         $this->assertTrue($e->enforce('alice', 'data1', 'read'));
     }
 
-    public function testEnableAutoSave()
+    public function testEnableAutoSave(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_model.conf', $this->modelAndPolicyPath . '/basic_policy.csv');
         $e->enableAutoSave(false);
@@ -58,7 +60,7 @@ class CoreEnforcerTest extends TestCase
         $this->assertFalse($e->enforce('alice', 'data1', 'write'));
     }
 
-    public function testInitEmpty()
+    public function testInitEmpty(): void
     {
         $e = new Enforcer(true);
 
@@ -88,7 +90,7 @@ EOT
         $this->assertFalse($e->enforce('alice', 'data2', 'read'));
     }
 
-    public function testGetAndSetModel()
+    public function testGetAndSetModel(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_model.conf', $this->modelAndPolicyPath . '/basic_policy.csv');
         $e2 = new Enforcer($this->modelAndPolicyPath . '/basic_with_root_model.conf', $this->modelAndPolicyPath . '/basic_policy.csv');
@@ -100,7 +102,7 @@ EOT
         $this->assertTrue($e->enforce('root', 'data1', 'read'));
     }
 
-    public function testGetAndSetAdapter()
+    public function testGetAndSetAdapter(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_model.conf', $this->modelAndPolicyPath . '/basic_policy.csv');
         $e2 = new Enforcer($this->modelAndPolicyPath . '/basic_model.conf', $this->modelAndPolicyPath . '/basic_inverse_policy.csv');
@@ -118,14 +120,14 @@ EOT
         $this->assertTrue($e->enforce('alice', 'data1', 'write'));
     }
 
-    public function testGetRoleManager()
+    public function testGetRoleManager(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf');
         $rm = $e->getRoleManager();
         $this->assertTrue($rm instanceof RoleManager);
     }
 
-    public function testSetAdapterFromFile()
+    public function testSetAdapterFromFile(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_model.conf');
         $adapter = new FileAdapter($this->modelAndPolicyPath . '/basic_policy.csv');
@@ -137,7 +139,7 @@ EOT
         $this->assertFalse($e->enforce('alice', 'data2', 'read'));
     }
 
-    public function testClearPolicy()
+    public function testClearPolicy(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $this->assertTrue($e->enforce('alice', 'data1', 'read'));
@@ -145,7 +147,7 @@ EOT
         $this->assertFalse($e->enforce('alice', 'data1', 'read'));
     }
 
-    public function testSavePolicy()
+    public function testSavePolicy(): void
     {
         $policyFile = __DIR__ . '/Persist/Adapters/rbac_policy_test.csv';
         file_put_contents($policyFile, '', LOCK_EX);
@@ -172,7 +174,7 @@ EOT
         file_put_contents($policyFile, '', LOCK_EX);
     }
 
-    public function testFilteredPolicy()
+    public function testFilteredPolicy(): void
     {
         $adapter = new FileFilteredAdapter($this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domains_model.conf', $adapter);
@@ -196,7 +198,7 @@ EOT
         try {
             $e->savePolicy();
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
         }
         $this->assertInstanceOf(CasbinException::class, $th);
 
@@ -205,12 +207,12 @@ EOT
         try {
             $e->getAdapter()->savePolicy($e->getModel());
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
         }
         $this->assertInstanceOf(CasbinException::class, $th);
     }
 
-    public function testAppendFilteredPolicy()
+    public function testAppendFilteredPolicy(): void
     {
         $e = new Enforcer();
 
@@ -243,7 +245,7 @@ EOT
         $this->assertTrue($e->hasPolicy('admin', 'domain2', 'data2', 'read'));
     }
 
-    public function testEnableEnforce()
+    public function testEnableEnforce(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_model.conf', $this->modelAndPolicyPath . '/basic_policy.csv');
         $e->enableEnforce(false);
@@ -270,7 +272,7 @@ EOT
         $this->assertTrue($e->enforce('bob', 'data2', 'write'));
     }
 
-    public function testPriorityExplicit()
+    public function testPriorityExplicit(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/priority_model_explicit.conf', $this->modelAndPolicyPath . '/priority_policy_explicit.csv');
         $this->assertTrue($e->enforce('alice', 'data1', 'write'));

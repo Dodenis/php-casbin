@@ -6,47 +6,45 @@ namespace Casbin;
 
 /**
  * Class EnforceContext
- * EnforceContext is used as the first element of the parameter "rvals" in method "enforce"
+ * EnforceContext is used as the first element of the parameter "rvals" in method "enforce".
  *
  * @author ab1652759879@gmail.com
  */
 class EnforceContext
 {
     /**
-     * rType
+     * rType.
      *
      * @var string
      */
     public $rType;
     /**
-     * pType
+     * pType.
      *
      * @var string
      */
     public $pType;
     /**
-     * eType
+     * eType.
      *
      * @var string
      */
     public $eType;
     /**
-     * mType
+     * mType.
      *
      * @var string
      */
     public $mType;
 
     /**
-     * Create a default structure based on the suffix
-     *
-     * @param string $suffix
+     * Create a default structure based on the suffix.
      */
     public function __construct(string $suffix)
     {
-        $this->rType = "r" . $suffix;
-        $this->pType = "p" . $suffix;
-        $this->eType = "e" . $suffix;
-        $this->mType = "m" . $suffix;
+        $this->rType = 'r' . $suffix;
+        $this->pType = 'p' . $suffix;
+        $this->eType = 'e' . $suffix;
+        $this->mType = 'm' . $suffix;
     }
 }

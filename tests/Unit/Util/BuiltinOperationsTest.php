@@ -9,32 +9,34 @@ use PHPUnit\Framework\TestCase;
  * RoleManagerTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class BuiltinOperationsTest extends TestCase
 {
     private function keyMatchFunc($name1, $name2)
     {
-        return (bool)BuiltinOperations::keyMatchFunc($name1, $name2);
+        return (bool) BuiltinOperations::keyMatchFunc($name1, $name2);
     }
 
     private function keyMatch2Func($name1, $name2)
     {
-        return (bool)BuiltinOperations::keyMatch2Func($name1, $name2);
+        return (bool) BuiltinOperations::keyMatch2Func($name1, $name2);
     }
 
     private function keyMatch3Func($name1, $name2)
     {
-        return (bool)BuiltinOperations::keyMatch3Func($name1, $name2);
+        return (bool) BuiltinOperations::keyMatch3Func($name1, $name2);
     }
 
     private function keyMatch4Func($name1, $name2)
     {
-        return (bool)BuiltinOperations::keyMatch4Func($name1, $name2);
+        return (bool) BuiltinOperations::keyMatch4Func($name1, $name2);
     }
 
     private function keyMatch5Func($name1, $name2)
     {
-        return (bool)BuiltinOperations::keyMatch5Func($name1, $name2);
+        return (bool) BuiltinOperations::keyMatch5Func($name1, $name2);
     }
 
     private function globMatchFunc($name1, $name2)
@@ -52,7 +54,7 @@ class BuiltinOperationsTest extends TestCase
         return BuiltinOperations::KeyGet2Func($name1, $name2, $pathVar);
     }
 
-    public function testKeyMatchFunc()
+    public function testKeyMatchFunc(): void
     {
         $this->assertTrue($this->keyMatchFunc('/foo', '/foo'));
         $this->assertTrue($this->keyMatchFunc('/foo', '/foo*'));
@@ -65,7 +67,7 @@ class BuiltinOperationsTest extends TestCase
         $this->assertFalse($this->keyMatchFunc('/foobar', '/foo/*'));
     }
 
-    public function testKeyMatch2Func()
+    public function testKeyMatch2Func(): void
     {
         $this->assertTrue($this->keyMatch2Func('/foo', '/foo'));
         $this->assertTrue($this->keyMatch2Func('/foo', '/foo*'));
@@ -97,7 +99,7 @@ class BuiltinOperationsTest extends TestCase
         $this->assertFalse($this->keyMatch2Func('/alice/all', '/:/all'));
     }
 
-    public function testKeyMatch3Func()
+    public function testKeyMatch3Func(): void
     {
         $this->assertTrue($this->keyMatch3Func('/foo', '/foo'));
         $this->assertTrue($this->keyMatch3Func('/foo', '/foo*'));
@@ -124,7 +126,7 @@ class BuiltinOperationsTest extends TestCase
         $this->assertFalse($this->keyMatch3Func('/myid/using/myresid', '/{id/using/{resId}'));
     }
 
-    public function testKeyMatch4Func()
+    public function testKeyMatch4Func(): void
     {
         $this->assertTrue($this->keyMatch4Func('/parent/123/child/123', '/parent/{id}/child/{id}'));
         $this->assertFalse($this->keyMatch4Func('/parent/123/child/456', '/parent/{id}/child/{id}'));
@@ -141,7 +143,7 @@ class BuiltinOperationsTest extends TestCase
         $this->assertFalse($this->keyMatch4Func('/parent/123/child/123', '/parent/{i/d}/child/{i/d}'));
     }
 
-    public function testKeyMatch5Func()
+    public function testKeyMatch5Func(): void
     {
         $this->assertTrue($this->keyMatch5Func('/parent/child', '/parent/child'));
         $this->assertTrue($this->keyMatch5Func('/parent/child?status=1&type=2', '/parent/child'));
@@ -152,7 +154,7 @@ class BuiltinOperationsTest extends TestCase
         $this->assertFalse($this->keyMatch5Func('/parent/child?status=1&type=2', '/parent/child/'));
     }
 
-    public function testGlobMatchFunc()
+    public function testGlobMatchFunc(): void
     {
         $this->assertTrue($this->globMatchFunc('/foo', '/foo'));
         $this->assertTrue($this->globMatchFunc('/foo', '/foo*'));
@@ -163,7 +165,7 @@ class BuiltinOperationsTest extends TestCase
         $this->assertTrue($this->globMatchFunc('/foo/bar', '/foo/*'));
     }
 
-    public function testKeyGetFunc()
+    public function testKeyGetFunc(): void
     {
         $this->assertEquals('', $this->keyGetFunc('/foo', '/foo'));
         $this->assertEquals('', $this->keyGetFunc('/foo', '/foo*'));
@@ -176,37 +178,37 @@ class BuiltinOperationsTest extends TestCase
         $this->assertEquals('', $this->keyGetFunc('/foobar', '/foo/*'));
     }
 
-    public function testKeyGet2Func()
+    public function testKeyGet2Func(): void
     {
-        $this->assertEquals('', $this->keyGet2Func("/foo", "/foo", "id"));
-        $this->assertEquals('', $this->keyGet2Func("/foo", "/foo*", "id"));
-        $this->assertEquals('', $this->keyGet2Func("/foo", "/foo/*", "id"));
-        $this->assertEquals('', $this->keyGet2Func("/foo/bar", "/foo", "id"));
+        $this->assertEquals('', $this->keyGet2Func('/foo', '/foo', 'id'));
+        $this->assertEquals('', $this->keyGet2Func('/foo', '/foo*', 'id'));
+        $this->assertEquals('', $this->keyGet2Func('/foo', '/foo/*', 'id'));
+        $this->assertEquals('', $this->keyGet2Func('/foo/bar', '/foo', 'id'));
         // different with KeyMatch.
-        $this->assertEquals('', $this->keyGet2Func("/foo/bar", "/foo*", "id"));
-        $this->assertEquals('', $this->keyGet2Func("/foo/bar", "/foo/*", "id"));
-        $this->assertEquals('', $this->keyGet2Func("/foobar", "/foo", "id"));
+        $this->assertEquals('', $this->keyGet2Func('/foo/bar', '/foo*', 'id'));
+        $this->assertEquals('', $this->keyGet2Func('/foo/bar', '/foo/*', 'id'));
+        $this->assertEquals('', $this->keyGet2Func('/foobar', '/foo', 'id'));
         // different with KeyMatch.
-        $this->assertEquals('', $this->keyGet2Func("/foobar", "/foo*", "id"));
-        $this->assertEquals('', $this->keyGet2Func("/foobar", "/foo/*", "id"));
-        $this->assertEquals('', $this->keyGet2Func("/", "/:resource", "resource"));
-        $this->assertEquals('resource1', $this->keyGet2Func("/resource1", "/:resource", "resource"));
-        $this->assertEquals('', $this->keyGet2Func("/myid", "/:id/using/:resId", "id"));
-        $this->assertEquals('myid', $this->keyGet2Func("/myid/using/myresid", "/:id/using/:resId", "id"));
-        $this->assertEquals('myresid', $this->keyGet2Func("/myid/using/myresid", "/:id/using/:resId", "resId"));
+        $this->assertEquals('', $this->keyGet2Func('/foobar', '/foo*', 'id'));
+        $this->assertEquals('', $this->keyGet2Func('/foobar', '/foo/*', 'id'));
+        $this->assertEquals('', $this->keyGet2Func('/', '/:resource', 'resource'));
+        $this->assertEquals('resource1', $this->keyGet2Func('/resource1', '/:resource', 'resource'));
+        $this->assertEquals('', $this->keyGet2Func('/myid', '/:id/using/:resId', 'id'));
+        $this->assertEquals('myid', $this->keyGet2Func('/myid/using/myresid', '/:id/using/:resId', 'id'));
+        $this->assertEquals('myresid', $this->keyGet2Func('/myid/using/myresid', '/:id/using/:resId', 'resId'));
 
-        $this->assertEquals('', $this->keyGet2Func("/proxy/myid", "/proxy/:id/*", "id"));
-        $this->assertEquals('myid', $this->keyGet2Func("/proxy/myid/", "/proxy/:id/*", "id"));
-        $this->assertEquals('myid', $this->keyGet2Func("/proxy/myid/res", "/proxy/:id/*", "id"));
-        $this->assertEquals('myid', $this->keyGet2Func("/proxy/myid/res/res2", "/proxy/:id/*", "id"));
-        $this->assertEquals('myid', $this->keyGet2Func("/proxy/myid/res/res2/res3", "/proxy/:id/*", "id"));
-        $this->assertEquals('myid', $this->keyGet2Func("/proxy/myid/res/res2/res3", "/proxy/:id/res/*", "id"));
-        $this->assertEquals('', $this->keyGet2Func('/proxy/', "/proxy/:id/*", "id"));
-        $this->assertEquals('alice', $this->keyGet2Func("/alice", "/:id", "id"));
-        $this->assertEquals('alice', $this->keyGet2Func("/alice/all", "/:id/all", "id"));
-        $this->assertEquals('', $this->keyGet2Func("/alice", "/:id/all", "id"));
-        $this->assertEquals('', $this->keyGet2Func("/alice/all", "/:id", "id"));
+        $this->assertEquals('', $this->keyGet2Func('/proxy/myid', '/proxy/:id/*', 'id'));
+        $this->assertEquals('myid', $this->keyGet2Func('/proxy/myid/', '/proxy/:id/*', 'id'));
+        $this->assertEquals('myid', $this->keyGet2Func('/proxy/myid/res', '/proxy/:id/*', 'id'));
+        $this->assertEquals('myid', $this->keyGet2Func('/proxy/myid/res/res2', '/proxy/:id/*', 'id'));
+        $this->assertEquals('myid', $this->keyGet2Func('/proxy/myid/res/res2/res3', '/proxy/:id/*', 'id'));
+        $this->assertEquals('myid', $this->keyGet2Func('/proxy/myid/res/res2/res3', '/proxy/:id/res/*', 'id'));
+        $this->assertEquals('', $this->keyGet2Func('/proxy/', '/proxy/:id/*', 'id'));
+        $this->assertEquals('alice', $this->keyGet2Func('/alice', '/:id', 'id'));
+        $this->assertEquals('alice', $this->keyGet2Func('/alice/all', '/:id/all', 'id'));
+        $this->assertEquals('', $this->keyGet2Func('/alice', '/:id/all', 'id'));
+        $this->assertEquals('', $this->keyGet2Func('/alice/all', '/:id', 'id'));
 
-        $this->assertEquals('', $this->keyGet2Func("/alice/all", "/:/all", ""));
+        $this->assertEquals('', $this->keyGet2Func('/alice/all', '/:/all', ''));
     }
 }

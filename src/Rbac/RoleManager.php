@@ -21,11 +21,6 @@ interface RoleManager
      * Adds the inheritance link between role: name1 and role: name2.
      * aka role: name1 inherits role: name2.
      * domain is a prefix to the roles.
-     *
-     * @param string $name1
-     * @param string $name2
-     *
-     * @param string ...$domain
      */
     public function addLink(string $name1, string $name2, string ...$domain): void;
 
@@ -33,31 +28,18 @@ interface RoleManager
      * Deletes the inheritance link between role: name1 and role: name2.
      * aka role: name1 does not inherit role: name2 any more.
      * domain is a prefix to the roles.
-     *
-     * @param string $name1
-     * @param string $name2
-     * @param string ...$domain
      */
     public function deleteLink(string $name1, string $name2, string ...$domain): void;
 
     /**
      * Determines whether role: name1 inherits role: name2.
      * domain is a prefix to the roles.
-     *
-     * @param string $name1
-     * @param string $name2
-     * @param string ...$domain
-     *
-     * @return bool
      */
     public function hasLink(string $name1, string $name2, string ...$domain): bool;
 
     /**
      * Gets the roles that a subject inherits.
      * domain is a prefix to the roles.
-     *
-     * @param string $name
-     * @param string ...$domain
      *
      * @return string[]
      */
@@ -66,9 +48,6 @@ interface RoleManager
     /**
      * Gets the users that inherits a subject.
      * domain is an unreferenced parameter here, may be used in other implementations.
-     *
-     * @param string $name
-     * @param string ...$domain
      *
      * @return string[]
      */
@@ -81,19 +60,11 @@ interface RoleManager
 
     /**
      * Support use pattern in g.
-     *
-     * @param string $name
-     * @param \Closure $fn
-     * @return void
      */
     public function addMatchingFunc(string $name, \Closure $fn): void;
 
     /**
      * Support use domain pattern in g.
-     *
-     * @param string $name
-     * @param \Closure $fn
-     * @return void
      */
     public function addDomainMatchingFunc(string $name, \Closure $fn): void;
 }

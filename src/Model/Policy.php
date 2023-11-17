@@ -13,17 +13,17 @@ use Casbin\Util\Util;
 /**
  * Class Policy.
  *
- * @package Casbin\Model
  * @implements ArrayAccess<string, array<string, Assertion>>
+ *
  * @author techlee@qq.com
  */
-abstract class Policy implements ArrayAccess
+abstract class Policy implements \ArrayAccess
 {
     public const POLICY_ADD = 0;
 
     public const POLICY_REMOVE = 1;
 
-    const DEFAULT_SEP = ",";
+    public const DEFAULT_SEP = ',';
 
     /**
      * All of the Model items.
@@ -36,15 +36,11 @@ abstract class Policy implements ArrayAccess
      * BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
      *
      * @param RoleManager[] $rmMap
-     * @param integer $op
-     * @param string $sec
-     * @param string $ptype
-     * @param string[][] $rules
-     * @return void
+     * @param string[][]    $rules
      */
     public function buildIncrementalRoleLinks(array $rmMap, int $op, string $sec, string $ptype, array $rules): void
     {
-        if ($sec == "g") {
+        if ('g' == $sec) {
             $this->items[$sec][$ptype]->buildIncrementalRoleLinks($rmMap[$ptype], $op, $rules);
         }
     }
@@ -53,6 +49,7 @@ abstract class Policy implements ArrayAccess
      * Initializes the roles in RBAC.
      *
      * @param RoleManager[] $rmMap
+     *
      * @throws CasbinException
      */
     public function buildRoleLinks(array $rmMap): void
@@ -78,6 +75,7 @@ abstract class Policy implements ArrayAccess
             if (!isset($this->items[$sec])) {
                 return;
             }
+
             foreach ($this->items[$sec] as $key => $ast) {
                 Log::logPrint($key, ': ', $ast->value, ': ', $ast->policy);
             }
@@ -104,9 +102,6 @@ abstract class Policy implements ArrayAccess
     /**
      * Gets all rules in a policy.
      *
-     * @param string $sec
-     * @param string $ptype
-     *
      * @return string[][]
      */
     public function getPolicy(string $sec, string $ptype): array
@@ -117,11 +112,6 @@ abstract class Policy implements ArrayAccess
     /**
      * Gets rules based on field filters from a policy.
      *
-     * @param string $sec
-     * @param string $ptype
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
      * @return string[][]
      */
     public function getFilteredPolicy(string $sec, string $ptype, int $fieldIndex, string ...$fieldValues): array
@@ -130,6 +120,7 @@ abstract class Policy implements ArrayAccess
 
         foreach ($this->items[$sec][$ptype]->policy as $rule) {
             $matched = true;
+
             foreach ($fieldValues as $i => $fieldValue) {
                 if ('' != $fieldValue && $rule[$fieldIndex + intval($i)] != $fieldValue) {
                     $matched = false;
@@ -149,11 +140,7 @@ abstract class Policy implements ArrayAccess
     /**
      * Determines whether a model has the specified policy rule.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[] $rule
-     *
-     * @return bool
      */
     public function hasPolicy(string $sec, string $ptype, array $rule): bool
     {
@@ -167,11 +154,7 @@ abstract class Policy implements ArrayAccess
     /**
      * Determines whether a model has any of the specified policies. If one is found we return true.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[][] $rules
-     *
-     * @return bool
      */
     public function hasPolicies(string $sec, string $ptype, array $rules): bool
     {
@@ -187,8 +170,6 @@ abstract class Policy implements ArrayAccess
     /**
      * Adds a policy rule to the model.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[] $rule
      */
     public function addPolicy(string $sec, string $ptype, array $rule): void
@@ -197,13 +178,15 @@ abstract class Policy implements ArrayAccess
         $assertion->policy[] = $rule;
         $assertion->policyMap[implode(self::DEFAULT_SEP, $rule)] = count($this->items[$sec][$ptype]->policy) - 1;
 
-        if ($sec == 'p' && $assertion->priorityIndex !== false && $assertion->priorityIndex >= 0) {
+        if ('p' == $sec && false !== $assertion->priorityIndex && $assertion->priorityIndex >= 0) {
             $idxInsert = $rule[$assertion->priorityIndex];
-            for ($i = count($assertion->policy) - 1; $i > 0; $i--) {
+
+            for ($i = count($assertion->policy) - 1; $i > 0; --$i) {
                 $idx = $assertion->policy[$i - 1][$assertion->priorityIndex];
+
                 if ($idx > $idxInsert) {
                     $assertion->policy[$i] = $assertion->policy[$i - 1];
-                    $assertion->policyMap[implode(self::DEFAULT_SEP, $assertion->policy[$i - 1])]++;
+                    ++$assertion->policyMap[implode(self::DEFAULT_SEP, $assertion->policy[$i - 1])];
                 } else {
                     break;
                 }
@@ -216,14 +199,13 @@ abstract class Policy implements ArrayAccess
     /**
      * Adds a policy rules to the model.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[][] $rules
      */
     public function addPolicies(string $sec, string $ptype, array $rules): void
     {
         foreach ($rules as $rule) {
             $hashKey = implode(self::DEFAULT_SEP, $rule);
+
             if (isset($this->items[$sec][$ptype]->policyMap[$hashKey])) {
                 continue;
             }
@@ -234,16 +216,13 @@ abstract class Policy implements ArrayAccess
     /**
      * Updates a policy rule from the model.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[] $oldRule
      * @param string[] $newRule
-     *
-     * @return bool
      */
     public function updatePolicy(string $sec, string $ptype, array $oldRule, array $newRule): bool
     {
         $oldPolicy = implode(self::DEFAULT_SEP, $oldRule);
+
         if (!isset($this->items[$sec][$ptype]->policyMap[$oldPolicy])) {
             return false;
         }
@@ -259,20 +238,19 @@ abstract class Policy implements ArrayAccess
     /**
      * UpdatePolicies updates a policy rule from the model.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[][] $oldRules
      * @param string[][] $newRules
-     * @return boolean
      */
     public function updatePolicies(string $sec, string $ptype, array $oldRules, array $newRules): bool
     {
         $modifiedRuleIndex = [];
 
         $newIndex = 0;
+
         foreach ($oldRules as $oldIndex => $oldRule) {
             $oldPolicy = implode(self::DEFAULT_SEP, $oldRule);
             $index = $this->items[$sec][$ptype]->policyMap[$oldPolicy] ?? null;
+
             if (is_null($index)) {
                 // rollback
                 foreach ($modifiedRuleIndex as $index => $oldNewIndex) {
@@ -282,6 +260,7 @@ abstract class Policy implements ArrayAccess
                     unset($this->items[$sec][$ptype]->policyMap[$newPolicy]);
                     $this->items[$sec][$ptype]->policyMap[$oldPolicy] = $index;
                 }
+
                 return false;
             }
 
@@ -289,7 +268,7 @@ abstract class Policy implements ArrayAccess
             unset($this->items[$sec][$ptype]->policyMap[$oldPolicy]);
             $this->items[$sec][$ptype]->policyMap[implode(self::DEFAULT_SEP, $newRules[$newIndex])] = $index;
             $modifiedRuleIndex[$index] = [$oldIndex, $newIndex];
-            $newIndex++;
+            ++$newIndex;
         }
 
         return true;
@@ -297,12 +276,6 @@ abstract class Policy implements ArrayAccess
 
     /**
      * Removes a policy rule from the model.
-     *
-     * @param string $sec
-     * @param string $ptype
-     * @param array $rule
-     *
-     * @return bool
      */
     public function removePolicy(string $sec, string $ptype, array $rule): bool
     {
@@ -311,6 +284,7 @@ abstract class Policy implements ArrayAccess
         }
 
         $hashKey = implode(self::DEFAULT_SEP, $rule);
+
         if (!isset($this->items[$sec][$ptype]->policyMap[$hashKey])) {
             return false;
         }
@@ -321,7 +295,8 @@ abstract class Policy implements ArrayAccess
         unset($this->items[$sec][$ptype]->policyMap[$hashKey]);
 
         $count = count($this->items[$sec][$ptype]->policy);
-        for ($i = $index; $i < $count; $i++) {
+
+        for ($i = $index; $i < $count; ++$i) {
             $this->items[$sec][$ptype]->policyMap[implode(self::DEFAULT_SEP, $this->items[$sec][$ptype]->policy[$i])] = $i;
         }
 
@@ -331,11 +306,7 @@ abstract class Policy implements ArrayAccess
     /**
      * Removes a policy rules from the model.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[][] $rules
-     *
-     * @return bool
      */
     public function removePolicies(string $sec, string $ptype, array $rules): bool
     {
@@ -353,13 +324,11 @@ abstract class Policy implements ArrayAccess
     /**
      * Removes policy rules based on field filters from the model.
      *
-     * @param string $sec
-     * @param string $ptype
-     * @param int $fieldIndex
      * @param string ...$fieldValues
      *
      * If more than one rule is removed, return the removed rule array, otherwise return false
-     * @return string[][]|false
+     *
+     * @return false|string[][]
      */
     public function removeFilteredPolicy(string $sec, string $ptype, int $fieldIndex, string ...$fieldValues)
     {
@@ -375,9 +344,11 @@ abstract class Policy implements ArrayAccess
 
         foreach ($this->items[$sec][$ptype]->policy as $index => $rule) {
             $matched = true;
+
             foreach ($fieldValues as $i => $fieldValue) {
                 if ('' != $fieldValue && $rule[$fieldIndex + intval($i)] != $fieldValue) {
                     $matched = false;
+
                     break;
                 }
             }
@@ -401,10 +372,6 @@ abstract class Policy implements ArrayAccess
     /**
      * Gets all values for a field for all rules in a policy, duplicated values are removed.
      *
-     * @param string $sec
-     * @param string $ptype
-     * @param int $fieldIndex
-     *
      * @return string[]
      */
     public function getValuesForFieldInPolicy(string $sec, string $ptype, int $fieldIndex): array
@@ -427,9 +394,6 @@ abstract class Policy implements ArrayAccess
     /**
      * Gets all values for a field for all rules in a policy of all ptypes, duplicated values are removed.
      *
-     * @param string $sec
-     * @param int $fieldIndex
-     *
      * @return string[]
      */
     public function getValuesForFieldInPolicyAllTypes(string $sec, int $fieldIndex): array
@@ -449,8 +413,6 @@ abstract class Policy implements ArrayAccess
      * Determine if the given Model option exists.
      *
      * @param string $offset
-     *
-     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -462,7 +424,7 @@ abstract class Policy implements ArrayAccess
      *
      * @param string $offset
      *
-     * @return array<string, Assertion>|null
+     * @return null|array<string, Assertion>
      */
     public function offsetGet($offset): ?array
     {
@@ -472,7 +434,7 @@ abstract class Policy implements ArrayAccess
     /**
      * Set a Model option.
      *
-     * @param string $offset
+     * @param string                   $offset
      * @param array<string, Assertion> $value
      */
     public function offsetSet($offset, $value): void

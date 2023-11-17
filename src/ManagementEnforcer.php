@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Casbin;
 
-use Closure;
-
 /**
  * ManagementEnforcer = InternalEnforcer + Management API.
  *
@@ -15,8 +13,6 @@ class ManagementEnforcer extends InternalEnforcer
 {
     /**
      * Gets the list of subjects that show up in the current policy.
-     *
-     * @return array
      */
     public function getAllSubjects(): array
     {
@@ -25,10 +21,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets the list of subjects that show up in the current named policy.
-     *
-     * @param string $ptype
-     *
-     * @return array
      */
     public function getAllNamedSubjects(string $ptype): array
     {
@@ -37,8 +29,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets the list of objects that show up in the current policy.
-     *
-     * @return array
      */
     public function getAllObjects(): array
     {
@@ -47,10 +37,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets the list of objects that show up in the current named policy.
-     *
-     * @param string $ptype
-     *
-     * @return array
      */
     public function getAllNamedObjects(string $ptype): array
     {
@@ -59,8 +45,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets the list of actions that show up in the current policy.
-     *
-     * @return array
      */
     public function getAllActions(): array
     {
@@ -69,10 +53,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets the list of actions that show up in the current named policy.
-     *
-     * @param string $ptype
-     *
-     * @return array
      */
     public function getAllNamedActions(string $ptype): array
     {
@@ -81,8 +61,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets the list of roles that show up in the current policy.
-     *
-     * @return array
      */
     public function getAllRoles(): array
     {
@@ -91,10 +69,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets the list of roles that show up in the current named policy.
-     *
-     * @param string $ptype
-     *
-     * @return array
      */
     public function getAllNamedRoles(string $ptype): array
     {
@@ -103,8 +77,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets all the authorization rules in the policy.
-     *
-     * @return array
      */
     public function getPolicy(): array
     {
@@ -113,11 +85,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets all the authorization rules in the policy, field filters can be specified.
-     *
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
-     * @return array
      */
     public function getFilteredPolicy(int $fieldIndex, string ...$fieldValues): array
     {
@@ -126,10 +93,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets all the authorization rules in the named policy.
-     *
-     * @param string $ptype
-     *
-     * @return array
      */
     public function getNamedPolicy(string $ptype): array
     {
@@ -138,12 +101,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets all the authorization rules in the named policy, field filters can be specified.
-     *
-     * @param string $ptype
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
-     * @return array
      */
     public function getFilteredNamedPolicy(string $ptype, int $fieldIndex, string ...$fieldValues): array
     {
@@ -152,8 +109,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets all the role inheritance rules in the policy.
-     *
-     * @return array
      */
     public function getGroupingPolicy(): array
     {
@@ -162,11 +117,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets all the role inheritance rules in the policy, field filters can be specified.
-     *
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
-     * @return array
      */
     public function getFilteredGroupingPolicy(int $fieldIndex, string ...$fieldValues): array
     {
@@ -175,10 +125,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets all the role inheritance rules in the policy.
-     *
-     * @param string $ptype
-     *
-     * @return array
      */
     public function getNamedGroupingPolicy(string $ptype): array
     {
@@ -187,12 +133,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Gets all the role inheritance rules in the policy, field filters can be specified.
-     *
-     * @param string $ptype
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
-     * @return array
      */
     public function getFilteredNamedGroupingPolicy(string $ptype, int $fieldIndex, string ...$fieldValues): array
     {
@@ -203,8 +143,6 @@ class ManagementEnforcer extends InternalEnforcer
      * Determines whether an authorization rule exists.
      *
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function hasPolicy(...$params): bool
     {
@@ -214,10 +152,7 @@ class ManagementEnforcer extends InternalEnforcer
     /**
      * Determines whether a named authorization rule exists.
      *
-     * @param string $ptype
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function hasNamedPolicy(string $ptype, ...$params): bool
     {
@@ -234,8 +169,6 @@ class ManagementEnforcer extends InternalEnforcer
      * Otherwise the function returns true by adding the new rule.
      *
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function addPolicy(...$params): bool
     {
@@ -249,7 +182,6 @@ class ManagementEnforcer extends InternalEnforcer
      *
      * @param string[][] $rules
      *
-     * @return bool
      * @throws Exceptions\CasbinException
      */
     public function addPolicies(array $rules): bool
@@ -262,10 +194,7 @@ class ManagementEnforcer extends InternalEnforcer
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.
      *
-     * @param string $ptype
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function addNamedPolicy(string $ptype, ...$params): bool
     {
@@ -281,10 +210,8 @@ class ManagementEnforcer extends InternalEnforcer
      * If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
      * Otherwise the function returns true for the corresponding by adding the new rule.
      *
-     * @param string $ptype
      * @param string[][] $rules
      *
-     * @return bool
      * @throws Exceptions\CasbinException
      */
     public function addNamedPolicies(string $ptype, array $rules): bool
@@ -296,8 +223,6 @@ class ManagementEnforcer extends InternalEnforcer
      * Removes an authorization rule from the current policy.
      *
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function removePolicy(...$params): bool
     {
@@ -306,10 +231,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Removes an authorization rules from the current policy.
-     *
-     * @param array $rules
-     *
-     * @return bool
      */
     public function removePolicies(array $rules): bool
     {
@@ -321,26 +242,21 @@ class ManagementEnforcer extends InternalEnforcer
      *
      * @param string[] $oldRule
      * @param string[] $newRule
-     *
-     * @return bool
      */
     public function updatePolicy(array $oldRule, array $newRule): bool
     {
-        return $this->updateNamedPolicy("p", $oldRule, $newRule);
+        return $this->updateNamedPolicy('p', $oldRule, $newRule);
     }
 
     /**
      * Updates an authorization rule from the current policy.
      *
-     * @param string $ptype
      * @param string[] $oldRule
      * @param string[] $newRule
-     *
-     * @return bool
      */
     public function updateNamedPolicy(string $ptype, array $oldRule, array $newRule): bool
     {
-        return $this->updatePolicyInternal("p", $ptype, $oldRule, $newRule);
+        return $this->updatePolicyInternal('p', $ptype, $oldRule, $newRule);
     }
 
     /**
@@ -348,52 +264,38 @@ class ManagementEnforcer extends InternalEnforcer
      *
      * @param string[][] $oldPolices
      * @param string[][] $newPolicies
-     * @return boolean
      */
     public function updatePolicies(array $oldPolices, array $newPolicies): bool
     {
-        return $this->updateNamedPolicies("p", $oldPolices, $newPolicies);
+        return $this->updateNamedPolicies('p', $oldPolices, $newPolicies);
     }
 
     /**
      * Updates authorization rules from the current policy.
      *
-     * @param string $ptype
      * @param string[][] $oldPolices
      * @param string[][] $newPolicies
-     * @return boolean
      */
     public function updateNamedPolicies(string $ptype, array $oldPolices, array $newPolicies): bool
     {
-        return $this->updatePoliciesInternal("p", $ptype, $oldPolices, $newPolicies);
+        return $this->updatePoliciesInternal('p', $ptype, $oldPolices, $newPolicies);
     }
 
     public function updateFilteredPolicies(array $newPolicies, int $fieldIndex, string ...$fieldValues): bool
     {
-        return $this->updateFilteredNamedPolicies("p", $newPolicies, $fieldIndex, ...$fieldValues);
+        return $this->updateFilteredNamedPolicies('p', $newPolicies, $fieldIndex, ...$fieldValues);
     }
 
     /**
-     * Undocumented function
-     *
-     * @param string $ptype
-     * @param array $newPolicies
-     * @param integer $fieldIndex
-     * @param string ...$fieldValues
-     * @return boolean
+     * Undocumented function.
      */
     public function updateFilteredNamedPolicies(string $ptype, array $newPolicies, int $fieldIndex, string ...$fieldValues): bool
     {
-        return $this->updateFilteredPoliciesInternal("p", $ptype, $newPolicies, $fieldIndex, ...$fieldValues);
+        return $this->updateFilteredPoliciesInternal('p', $ptype, $newPolicies, $fieldIndex, ...$fieldValues);
     }
 
     /**
      * Removes an authorization rule from the current policy, field filters can be specified.
-     *
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
-     * @return bool
      */
     public function removeFilteredPolicy(int $fieldIndex, string ...$fieldValues): bool
     {
@@ -403,10 +305,7 @@ class ManagementEnforcer extends InternalEnforcer
     /**
      * Removes an authorization rule from the current named policy.
      *
-     * @param string $ptype
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function removeNamedPolicy(string $ptype, ...$params): bool
     {
@@ -419,11 +318,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Removes an authorization rules from the current named policy.
-     *
-     * @param string $ptype
-     * @param array $rules
-     *
-     * @return bool
      */
     public function removeNamedPolicies(string $ptype, array $rules): bool
     {
@@ -432,12 +326,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Removes an authorization rule from the current named policy, field filters can be specified.
-     *
-     * @param string $ptype
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
-     * @return bool
      */
     public function removeFilteredNamedPolicy(string $ptype, int $fieldIndex, string ...$fieldValues): bool
     {
@@ -448,8 +336,6 @@ class ManagementEnforcer extends InternalEnforcer
      * Determines whether a role inheritance rule exists.
      *
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function hasGroupingPolicy(...$params): bool
     {
@@ -459,10 +345,7 @@ class ManagementEnforcer extends InternalEnforcer
     /**
      * Determines whether a named role inheritance rule exists.
      *
-     * @param string $ptype
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function hasNamedGroupingPolicy(string $ptype, ...$params): bool
     {
@@ -479,8 +362,6 @@ class ManagementEnforcer extends InternalEnforcer
      * Otherwise the function returns true by adding the new rule.
      *
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function addGroupingPolicy(...$params): bool
     {
@@ -491,10 +372,6 @@ class ManagementEnforcer extends InternalEnforcer
      * AddGroupingPolicy adds a role inheritance rules to the current policy.
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.
-     *
-     * @param array $rules
-     *
-     * @return bool
      */
     public function addGroupingPolicies(array $rules): bool
     {
@@ -506,10 +383,7 @@ class ManagementEnforcer extends InternalEnforcer
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.
      *
-     * @param string $ptype
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function addNamedGroupingPolicy(string $ptype, ...$params): bool
     {
@@ -530,11 +404,6 @@ class ManagementEnforcer extends InternalEnforcer
      * AddNamedGroupingPolicy adds a named role inheritance rules to the current policy.
      * If the rule already exists, the function returns false and the rule will not be added.
      * Otherwise the function returns true by adding the new rule.
-     *
-     * @param string $ptype
-     * @param array $rules
-     *
-     * @return bool
      */
     public function addNamedGroupingPolicies(string $ptype, array $rules): bool
     {
@@ -551,8 +420,6 @@ class ManagementEnforcer extends InternalEnforcer
      * Removes a role inheritance rule from the current policy.
      *
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function removeGroupingPolicy(...$params): bool
     {
@@ -561,10 +428,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Removes a role inheritance rules from the current policy.
-     *
-     * @param array $rules
-     *
-     * @return bool
      */
     public function removeGroupingPolicies(array $rules): bool
     {
@@ -573,11 +436,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Removes a role inheritance rule from the current policy, field filters can be specified.
-     *
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
-     * @return bool
      */
     public function removeFilteredGroupingPolicy(int $fieldIndex, string ...$fieldValues): bool
     {
@@ -587,10 +445,7 @@ class ManagementEnforcer extends InternalEnforcer
     /**
      * Removes a role inheritance rule from the current named policy.
      *
-     * @param string $ptype
      * @param mixed ...$params
-     *
-     * @return bool
      */
     public function removeNamedGroupingPolicy(string $ptype, ...$params): bool
     {
@@ -609,11 +464,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Removes a role inheritance rules from the current named policy.
-     *
-     * @param string $ptype
-     * @param array $rules
-     *
-     * @return bool
      */
     public function removeNamedGroupingPolicies(string $ptype, array $rules): bool
     {
@@ -628,12 +478,6 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Removes a role inheritance rule from the current named policy, field filters can be specified.
-     *
-     * @param string $ptype
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
-     * @return bool
      */
     public function removeFilteredNamedGroupingPolicy(string $ptype, int $fieldIndex, string ...$fieldValues): bool
     {
@@ -648,11 +492,8 @@ class ManagementEnforcer extends InternalEnforcer
 
     /**
      * Adds a customized function.
-     *
-     * @param string $name
-     * @param Closure $func
      */
-    public function addFunction(string $name, Closure $func): void
+    public function addFunction(string $name, \Closure $func): void
     {
         $this->fm->addFunction($name, $func);
     }

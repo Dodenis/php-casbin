@@ -32,8 +32,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
 
     /**
      * FileAdapter constructor.
-     *
-     * @param string $filePath
      */
     public function __construct(string $filePath)
     {
@@ -42,8 +40,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
 
     /**
      * Loads all policy rules from the storage.
-     *
-     * @param Model $model
      *
      * @throws CasbinException
      */
@@ -58,8 +54,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
 
     /**
      * Saves all policy rules to the storage.
-     *
-     * @param Model $model
      *
      * @throws CasbinException
      */
@@ -95,7 +89,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
     }
 
     /**
-     * @param Model $model
      * @throws InvalidFilePathException
      */
     protected function loadPolicyFile(Model $model): void
@@ -112,9 +105,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
         fclose($file);
     }
 
-    /**
-     * @param string $text
-     */
     protected function savePolicyFile(string $text): void
     {
         file_put_contents($this->filePath, $text, LOCK_EX);
@@ -123,8 +113,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
     /**
      * Adds a policy rule to the storage.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[] $rule
      *
      * @throws NotImplementedException
@@ -137,8 +125,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
     /**
      * Adds a policy rule to the storage.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[][] $rules
      *
      * @throws NotImplementedException
@@ -151,8 +137,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
     /**
      * Removes a policy rule from the storage.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[] $rule
      *
      * @throws NotImplementedException
@@ -165,8 +149,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
     /**
      * Removes a policy rules from the storage.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[][] $rules
      *
      * @throws NotImplementedException
@@ -179,11 +161,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
     /**
      * Removes policy rules that match the filter from the storage.
      *
-     * @param string $sec
-     * @param string $ptype
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
      * @throws NotImplementedException
      */
     public function removeFilteredPolicy(string $sec, string $ptype, int $fieldIndex, string ...$fieldValues): void
@@ -195,8 +172,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
      * Updates a policy rule from storage.
      * This is part of the Auto-Save feature.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[] $oldRule
      * @param string[] $newPolicy
      */
@@ -208,11 +183,8 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
     /**
      * UpdatePolicies updates some policy rules to storage, like db, redis.
      *
-     * @param string $sec
-     * @param string $ptype
      * @param string[][] $oldRules
      * @param string[][] $newRules
-     * @return void
      */
     public function updatePolicies(string $sec, string $ptype, array $oldRules, array $newRules): void
     {
@@ -221,13 +193,6 @@ class FileAdapter implements Adapter, BatchAdapter, UpdatableAdapter
 
     /**
      * UpdateFilteredPolicies deletes old rules and adds new rules.
-     *
-     * @param string $sec
-     * @param string $ptype
-     * @param array $newPolicies
-     * @param integer $fieldIndex
-     * @param string ...$fieldValues
-     * @return array
      */
     public function updateFilteredPolicies(string $sec, string $ptype, array $newPolicies, int $fieldIndex, string ...$fieldValues): array
     {

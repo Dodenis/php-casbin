@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Casbin\Util;
 
 use Casbin\Rbac\RoleManager;
-use Closure;
-use Exception;
 use IPTools\IP;
 use IPTools\Range;
 
@@ -20,11 +18,6 @@ class BuiltinOperations
     /**
      * Determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
      * For example, "/foo/bar" matches "/foo/*".
-     *
-     * @param string $key1
-     * @param string $key2
-     *
-     * @return bool
      */
     public static function keyMatch(string $key1, string $key2): bool
     {
@@ -34,15 +27,13 @@ class BuiltinOperations
 
         $needle = rtrim($key2, '*');
 
-        return substr($key1, 0, \strlen($needle)) === (string)$needle;
+        return substr($key1, 0, \strlen($needle)) === (string) $needle;
     }
 
     /**
      * The wrapper for KeyMatch.
      *
      * @param mixed ...$args
-     *
-     * @return bool
      */
     public static function keyMatchFunc(...$args): bool
     {
@@ -55,30 +46,30 @@ class BuiltinOperations
     /**
      * KeyGet returns the matched part
      * For example, "/foo/bar/foo" matches "/foo/*"
-     * "bar/foo" will been returned
-     *
-     * @param string $key1
-     * @param string $key2
-     * @return string
+     * "bar/foo" will been returned.
      */
     public static function keyGet(string $key1, string $key2): string
     {
         $i = strpos($key2, '*');
-        if ($i === false) {
-            return "";
+
+        if (false === $i) {
+            return '';
         }
+
         if (strlen($key1) > $i) {
             if (substr($key1, 0, $i) == substr($key2, 0, $i)) {
                 return substr($key1, $i);
             }
         }
+
         return '';
     }
 
     /**
-     * KeyGetFunc is the wrapper for KeyGet
+     * KeyGetFunc is the wrapper for KeyGet.
      *
      * @param mixed ...$args
+     *
      * @return string
      */
     public static function keyGetFunc(...$args)
@@ -92,11 +83,6 @@ class BuiltinOperations
     /**
      * Determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
      * For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/:resource".
-     *
-     * @param string $key1
-     * @param string $key2
-     *
-     * @return bool
      */
     public static function keyMatch2(string $key1, string $key2): bool
     {
@@ -122,8 +108,6 @@ class BuiltinOperations
      * The wrapper for KeyMatch2.
      *
      * @param mixed ...$args
-     *
-     * @return bool
      */
     public static function keyMatch2Func(...$args): bool
     {
@@ -136,12 +120,7 @@ class BuiltinOperations
     /**
      * KeyGet2 returns value matched pattern
      * For example, "/resource1" matches "/:resource"
-     * if the pathVar == "resource", then "resource1" will be returned
-     *
-     * @param string $key1
-     * @param string $key2
-     * @param string $pathVar
-     * @return string
+     * if the pathVar == "resource", then "resource1" will be returned.
      */
     public static function keyGet2(string $key1, string $key2, string $pathVar): string
     {
@@ -159,25 +138,28 @@ class BuiltinOperations
             $key2
         );
 
-        $key2 = "~^" . $key2 . "$~";
+        $key2 = '~^' . $key2 . '$~';
         $values = [];
         preg_match($key2, $key1, $values);
 
-        if (count($values) === 0) {
+        if (0 === count($values)) {
             return '';
         }
+
         foreach ($keys as $i => $key) {
             if ($pathVar == substr($key, 1)) {
                 return $values[$i + 1];
             }
         }
+
         return '';
     }
 
     /**
-     * KeyGet2Func is the wrapper for KeyGet2
+     * KeyGet2Func is the wrapper for KeyGet2.
      *
      * @param mixed ...$args
+     *
      * @return string
      */
     public static function keyGet2Func(...$args)
@@ -192,11 +174,6 @@ class BuiltinOperations
     /**
      * Determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
      * For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/{resource}".
-     *
-     * @param string $key1
-     * @param string $key2
-     *
-     * @return bool
      */
     public static function keyMatch3(string $key1, string $key2): bool
     {
@@ -218,8 +195,6 @@ class BuiltinOperations
      * The wrapper for KeyMatch3.
      *
      * @param mixed ...$args
-     *
-     * @return bool
      */
     public static function keyMatch3Func(...$args): bool
     {
@@ -235,11 +210,6 @@ class BuiltinOperations
      * "/parent/123/child/123" matches "/parent/{id}/child/{id}"
      * "/parent/123/child/456" does not match "/parent/{id}/child/{id}"
      * But KeyMatch3 will match both.
-     *
-     * @param string $key1
-     * @param string $key2
-     *
-     * @return bool
      */
     public static function keyMatch4(string $key1, string $key2): bool
     {
@@ -251,21 +221,25 @@ class BuiltinOperations
             $pattern,
             function ($m) use (&$tokens) {
                 $tokens[] = $m[1];
+
                 return '([^\/]+)';
             },
             $key2
         );
 
         $matched = preg_match_all('~^' . $key2 . '$~', $key1, $matches);
+
         if (!boolval($matched)) {
             return false;
         }
 
         $values = [];
+
         foreach ($tokens as $key => $token) {
             if (!isset($values[$token])) {
                 $values[$token] = $matches[$key + 1];
             }
+
             if ($values[$token] != $matches[$key + 1]) {
                 return false;
             }
@@ -278,8 +252,6 @@ class BuiltinOperations
      * The wrapper for KeyMatch4.
      *
      * @param mixed ...$args
-     *
-     * @return bool
      */
     public static function keyMatch4Func(...$args): bool
     {
@@ -291,17 +263,13 @@ class BuiltinOperations
 
     /**
      * Determines whether key1 matches the pattern of key2 and ignores the parameters in key2.
-     * For example, "/foo/bar?status=1&type=2" matches "/foo/bar"
-     *
-     * @param string $key1
-     * @param string $key2
-     *
-     * @return bool
+     * For example, "/foo/bar?status=1&type=2" matches "/foo/bar".
      */
     public static function keyMatch5(string $key1, string $key2): bool
     {
         $pos = strpos($key1, '?');
-        if ($pos === false) {
+
+        if (false === $pos) {
             return $key1 == $key2;
         }
 
@@ -312,8 +280,6 @@ class BuiltinOperations
      * the wrapper for KeyMatch5.
      *
      * @param mixed ...$args
-     *
-     * @return bool
      */
     public static function keyMatch5Func(...$args): bool
     {
@@ -325,23 +291,16 @@ class BuiltinOperations
 
     /**
      * Determines whether key1 matches the pattern of key2 in regular expression.
-     *
-     * @param string $key1
-     * @param string $key2
-     *
-     * @return bool
      */
     public static function regexMatch(string $key1, string $key2): bool
     {
-        return (bool)preg_match('~' . $key2 . '~', $key1);
+        return (bool) preg_match('~' . $key2 . '~', $key1);
     }
 
     /**
      * The wrapper for RegexMatch.
      *
      * @param mixed ...$args
-     *
-     * @return bool
      */
     public static function regexMatchFunc(...$args): bool
     {
@@ -355,12 +314,7 @@ class BuiltinOperations
      * Determines whether IP address ip1 matches the pattern of IP address ip2, ip2 can be an IP address or a CIDR
      * pattern.
      *
-     * @param string $ip1
-     * @param string $ip2
-     *
-     * @return bool
-     *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function ipMatch(string $ip1, string $ip2): bool
     {
@@ -376,9 +330,7 @@ class BuiltinOperations
      *
      * @param mixed ...$args
      *
-     * @return bool
-     *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function ipMatchFunc(...$args): bool
     {
@@ -391,12 +343,7 @@ class BuiltinOperations
     /**
      * Returns true if the specified `string` matches the given glob `pattern`.
      *
-     * @param string $str
-     * @param string $pattern
-     *
-     * @return bool
-     *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function globMatch(string $str, string $pattern): bool
     {
@@ -408,9 +355,7 @@ class BuiltinOperations
      *
      * @param mixed ...$args
      *
-     * @return bool
-     *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function globMatchFunc(...$args): bool
     {
@@ -422,18 +367,15 @@ class BuiltinOperations
 
     /**
      * The factory method of the g(_, _) function.
-     *
-     * @param RoleManager|null $rm
-     *
-     * @return Closure
      */
-    public static function generateGFunction(RoleManager $rm = null): Closure
+    public static function generateGFunction(RoleManager $rm = null): \Closure
     {
         $memorized = [];
+
         return function (...$args) use ($rm, &$memorized) {
             $key = implode(chr(0b0), $args);
 
-            if(isset($memorized[$key])){
+            if (isset($memorized[$key])) {
                 return $memorized[$key];
             }
 
@@ -445,11 +387,12 @@ class BuiltinOperations
             } elseif (2 == \count($args)) {
                 $v = $rm->hasLink($name1, $name2);
             } else {
-                $domain = (string)$args[2];
+                $domain = (string) $args[2];
                 $v = $rm->hasLink($name1, $name2, $domain);
             }
 
             $memorized[$key] = $v;
+
             return $v;
         };
     }

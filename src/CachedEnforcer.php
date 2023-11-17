@@ -37,8 +37,6 @@ class CachedEnforcer extends Enforcer
 
     /**
      * Determines whether to enable cache on Enforce(). When enableCache is enabled, cached result (true | false) will be returned for previous decisions.
-     *
-     * @param bool $enableCache
      */
     public function enableCache(bool $enableCache): void
     {
@@ -51,8 +49,6 @@ class CachedEnforcer extends Enforcer
      *
      * @param mixed ...$rvals
      *
-     * @return bool
-     *
      * @throws Exceptions\CasbinException
      */
     public function enforce(...$rvals): bool
@@ -62,22 +58,22 @@ class CachedEnforcer extends Enforcer
         }
 
         $key = '';
+
         foreach ($rvals as $rval) {
             if (is_string($rval)) {
-                $key .= $rval.'$$';
+                $key .= $rval . '$$';
             } else {
-                return  parent::enforce(...$rvals);
+                return parent::enforce(...$rvals);
             }
         }
 
         if (isset(self::$m[$key])) {
             return self::$m[$key];
-        } else {
-            $res = parent::enforce(...$rvals);
-            self::$m[$key] = $res;
-
-            return $res;
         }
+        $res = parent::enforce(...$rvals);
+        self::$m[$key] = $res;
+
+        return $res;
     }
 
     /**

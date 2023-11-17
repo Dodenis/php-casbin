@@ -9,12 +9,14 @@ use PHPUnit\Framework\TestCase;
  * PolicyTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class PolicyTest extends TestCase
 {
     private $modelAndPolicyPath = __DIR__ . '/../../../examples';
 
-    public function testGetPolicy()
+    public function testGetPolicy(): void
     {
         $m = new Model();
         $m->loadModel($this->modelAndPolicyPath . '/basic_model.conf');
@@ -26,7 +28,7 @@ class PolicyTest extends TestCase
         $this->assertTrue($m->getPolicy('p', 'p') == [$rule]);
     }
 
-    public function testHasPolicy()
+    public function testHasPolicy(): void
     {
         $m = new Model();
         $m->loadModel($this->modelAndPolicyPath . '/basic_model.conf');
@@ -38,7 +40,7 @@ class PolicyTest extends TestCase
         $this->assertTrue($m->hasPolicy('p', 'p', $rule));
     }
 
-    public function testHasPolicies()
+    public function testHasPolicies(): void
     {
         $m = Model::newModelFromFile($this->modelAndPolicyPath . '/basic_model.conf');
         $rules = [
@@ -60,7 +62,7 @@ class PolicyTest extends TestCase
         ]));
     }
 
-    public function testAddPolicy()
+    public function testAddPolicy(): void
     {
         $m = new Model();
         $m->loadModel($this->modelAndPolicyPath . '/basic_model.conf');
@@ -73,7 +75,7 @@ class PolicyTest extends TestCase
         $this->assertTrue($m->hasPolicy('p', 'p', $rule));
     }
 
-    public function testUpdatePolicy()
+    public function testUpdatePolicy(): void
     {
         $m = Model::newModelFromFile($this->modelAndPolicyPath . '/basic_model.conf');
         $rules = [
@@ -100,7 +102,7 @@ class PolicyTest extends TestCase
         ], $m->getPolicy('p', 'p'));
     }
 
-    public function testUpdatePolicies()
+    public function testUpdatePolicies(): void
     {
         $m = Model::newModelFromFile($this->modelAndPolicyPath . '/basic_model.conf');
         $rules = [
@@ -119,11 +121,11 @@ class PolicyTest extends TestCase
 
         $oldRules = [
             ['alice', 'domain1', 'data1', 'read'],
-            ['alice', 'domain1', 'data2', 'read']
+            ['alice', 'domain1', 'data2', 'read'],
         ];
         $newRules = [
             ['alice', 'domain1', 'data1', 'write'],
-            ['alice', 'domain1', 'data2', 'write']
+            ['alice', 'domain1', 'data2', 'write'],
         ];
         $m->updatePolicies('p', 'p', $oldRules, $newRules);
 
@@ -137,12 +139,12 @@ class PolicyTest extends TestCase
         // trigger callback of addPolicies
         $oldRules = [
             ['alice', 'domain1', 'data1', 'write'],
-            ['alice', 'domain1', 'data2', 'read']
+            ['alice', 'domain1', 'data2', 'read'],
         ];
         $this->assertFalse($m->updatePolicies('p', 'p', $oldRules, $newRules));
     }
 
-    public function testRemovePolicy()
+    public function testRemovePolicy(): void
     {
         $m = new Model();
         $m->loadModel($this->modelAndPolicyPath . '/basic_model.conf');
@@ -160,7 +162,7 @@ class PolicyTest extends TestCase
         $this->assertFalse($m->removePolicy('p', 'p', $rule));
     }
 
-    public function testRemoveFilteredPolicy()
+    public function testRemoveFilteredPolicy(): void
     {
         $m = new Model();
         $m->loadModel($this->modelAndPolicyPath . '/rbac_with_domains_model.conf');
@@ -182,7 +184,7 @@ class PolicyTest extends TestCase
         $this->assertFalse($res);
     }
 
-    public function testGetValuesForFieldInPolicy()
+    public function testGetValuesForFieldInPolicy(): void
     {
         $m = new Model();
         $m->loadModel($this->modelAndPolicyPath . '/rbac_with_domains_model.conf');

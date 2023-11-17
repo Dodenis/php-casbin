@@ -17,15 +17,12 @@ interface FilteredAdapter extends Adapter
     /**
      * Loads only policy rules that match the filter.
      *
-     * @param Model $model
      * @param mixed $filter
      */
     public function loadFilteredPolicy(Model $model, $filter): void;
 
     /**
      * Returns true if the loaded policy has been filtered.
-     *
-     * @return bool
      */
     public function isFiltered(): bool;
 }

@@ -9,10 +9,12 @@ use PHPUnit\Framework\TestCase;
  * UtilTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class UtilTest extends TestCase
 {
-    public function testEscapeAssertion()
+    public function testEscapeAssertion(): void
     {
         $this->assertEquals(Util::escapeAssertion('p.attr.value == p.attr'), 'p_attr.value == p_attr');
         $this->assertEquals(Util::escapeAssertion('r.attr.value == p.attr'), 'r_attr.value == p_attr');
@@ -30,14 +32,14 @@ class UtilTest extends TestCase
         $this->assertEquals(Util::escapeAssertion('(r.attp.value || p.attr)p.u'), '(r_attp.value || p_attr)p_u');
     }
 
-    public function testArrayRemoveDuplicates()
+    public function testArrayRemoveDuplicates(): void
     {
         $a = ['green', 'red', 'green', 'blue', 'red'];
         Util::arrayRemoveDuplicates($a);
         $this->assertEquals($a, ['green', 'red', 'blue']);
     }
 
-    public function testContainEval()
+    public function testContainEval(): void
     {
         $this->assertEquals(Util::hasEval('eval() && a && b &&c'), true);
         $this->assertEquals(Util::hasEval('eval) && a && b &&c'), false);
@@ -47,13 +49,13 @@ class UtilTest extends TestCase
         $this->assertEquals(Util::hasEval('xeval() && a && b &&c'), false);
     }
 
-    public function testReplaceEval()
+    public function testReplaceEval(): void
     {
         $this->assertEquals(Util::replaceEval('eval() && a && b && c', 'a'), '(a) && a && b && c');
         $this->assertEquals(Util::replaceEval('eval() && a && b && c', '(a)'), '((a)) && a && b && c');
     }
 
-    public function testGetEvalValue()
+    public function testGetEvalValue(): void
     {
         $this->assertEquals(Util::getEvalValue('eval(a) && a && b && c'), ['a']);
         $this->assertEquals(Util::getEvalValue('a && eval(a) && b && c'), ['a']);
@@ -61,7 +63,7 @@ class UtilTest extends TestCase
         $this->assertEquals(Util::getEvalValue('a && eval(a) && eval(b) && b && c'), ['a', 'b']);
     }
 
-    public function testReplaceEvalWithMap()
+    public function testReplaceEvalWithMap(): void
     {
         $this->assertEquals(Util::replaceEvalWithMap('eval(rule1)', ['rule1' => 'a == b']), 'a == b');
         $this->assertEquals(Util::replaceEvalWithMap('eval(rule1) && c && d', ['rule1' => 'a == b']), 'a == b && c && d');

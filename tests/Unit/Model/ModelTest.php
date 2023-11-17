@@ -5,29 +5,30 @@ namespace Casbin\Tests\Unit\Model;
 use Casbin\Enforcer;
 use Casbin\Exceptions\EvalFunctionException;
 use Casbin\Model\Model;
-use Casbin\Rbac\DefaultRoleManager\RoleManager;
 use Casbin\Util\BuiltinOperations;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 /**
  * ModelTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class ModelTest extends TestCase
 {
     private $modelAndPolicyPath = __DIR__ . '/../../../examples';
 
-    public static function newTestResource(string $name, string $owner): stdClass
+    public static function newTestResource(string $name, string $owner): \stdClass
     {
-        $r = new stdClass();
+        $r = new \stdClass();
         $r->name = $name;
         $r->owner = $owner;
+
         return $r;
     }
 
-    public function testLoadModelFromText()
+    public function testLoadModelFromText(): void
     {
         $text = <<<'EOT'
 # Request definition
@@ -62,7 +63,7 @@ EOT;
         $this->assertTrue($e->enforce('bob', 'data2', 'write'));
     }
 
-    public function testABACNotUsingPolicy()
+    public function testABACNotUsingPolicy(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/abac_not_using_policy_model.conf', $this->modelAndPolicyPath . '/abac_rule_effect_policy.csv');
         $data1 = self::newTestResource('data1', 'alice');
@@ -74,7 +75,7 @@ EOT;
         $this->assertEquals($e->enforce('alice', $data2, 'write'), false);
     }
 
-    public function testABACPolicy()
+    public function testABACPolicy(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/abac_rule_model.conf', $this->modelAndPolicyPath . '/abac_rule_policy.csv');
 
@@ -96,19 +97,19 @@ EOT;
         $this->assertEquals($e->enforce($sub3, '/data2', 'write'), false);
     }
 
-    public function testEvalFunctionException()
+    public function testEvalFunctionException(): void
     {
         $this->expectException(EvalFunctionException::class);
-        $this->expectExceptionMessage("please make sure rule exists in policy when using eval() in matcher");
+        $this->expectExceptionMessage('please make sure rule exists in policy when using eval() in matcher');
 
-        $e = new Enforcer($this->modelAndPolicyPath . '/abac_rule_model.conf', "");
+        $e = new Enforcer($this->modelAndPolicyPath . '/abac_rule_model.conf', '');
 
         $sub1 = new User('alice', 18);
 
         $e->enforce($sub1, '/data1', 'read');
     }
 
-    public function testRBACModelWithPattern()
+    public function testRBACModelWithPattern(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_pattern_model.conf', $this->modelAndPolicyPath . '/rbac_with_pattern_policy.csv');
 
@@ -144,7 +145,7 @@ EOT;
         $this->assertEquals($e->enforce('bob', '/pen2/2', 'GET'), true);
     }
 
-    public function testDomainMatchModel()
+    public function testDomainMatchModel(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domain_pattern_model.conf', $this->modelAndPolicyPath . '/rbac_with_domain_pattern_policy.csv');
         $e->addNamedDomainMatchingFunc('g', 'keyMatch2', function (string $key1, string $key2) {
@@ -163,7 +164,7 @@ EOT;
         $this->assertEquals($e->enforce('bob', 'domain2', 'data2', 'write'), true);
     }
 
-    public function testAllMatchModel()
+    public function testAllMatchModel(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_all_pattern_model.conf', $this->modelAndPolicyPath . '/rbac_with_all_pattern_policy.csv');
         $e->addNamedMatchingFunc('g', 'keyMatch2', function (string $key1, string $key2) {

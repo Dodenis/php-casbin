@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 namespace Casbin\Rbac\DefaultRoleManager;
-use Closure;
 
 /**
  * Role.
@@ -25,17 +24,12 @@ class Role
 
     /**
      * Role constructor.
-     *
-     * @param string $name
      */
     public function __construct(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * @param self $role
-     */
     public function addRole(self $role): void
     {
         // determine whether this role has been added
@@ -47,9 +41,6 @@ class Role
         $this->roles[] = $role;
     }
 
-    /**
-     * @param self $role
-     */
     public function deleteRole(self $role): void
     {
         foreach ($this->roles as $key => $rr) {
@@ -61,17 +52,12 @@ class Role
         }
     }
 
-    /**
-     * @param string $name
-     * @param int $hierarchyLevel
-     *
-     * @return bool
-     */
     public function hasRole(string $name, int $hierarchyLevel): bool
     {
         if ($this->hasDirectRole($name)) {
             return true;
         }
+
         if ($hierarchyLevel <= 0) {
             return false;
         }
@@ -85,14 +71,7 @@ class Role
         return false;
     }
 
-    /**
-     * @param string   $name
-     * @param int      $hierarchyLevel
-     * @param Closure  $matchingFunc
-     *
-     * @return bool
-     */
-    public function hasRoleWithMatchingFunc(string $name, int $hierarchyLevel, Closure $matchingFunc): bool
+    public function hasRoleWithMatchingFunc(string $name, int $hierarchyLevel, \Closure $matchingFunc): bool
     {
         if ($this->hasDirectRoleWithMatchingFunc($name, $matchingFunc)) {
             return true;
@@ -107,14 +86,10 @@ class Role
                 return true;
             }
         }
+
         return false;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
     public function hasDirectRole(string $name): bool
     {
         foreach ($this->roles as $role) {
@@ -126,13 +101,7 @@ class Role
         return false;
     }
 
-    /**
-     * @param string   $name
-     * @param Closure  $matchingFunc
-     *
-     * @return bool
-     */
-    public function hasDirectRoleWithMatchingFunc(string $name, Closure $matchingFunc): bool
+    public function hasDirectRoleWithMatchingFunc(string $name, \Closure $matchingFunc): bool
     {
         foreach ($this->roles as $role) {
             if ($role->name == $name || $matchingFunc($name, $role->name)) {
@@ -143,9 +112,6 @@ class Role
         return false;
     }
 
-    /**
-     * @return string
-     */
     public function toString(): string
     {
         $len = \count($this->roles);
@@ -158,9 +124,9 @@ class Role
 
         if (1 == $len) {
             return $this->name . ' < ' . $names;
-        } else {
-            return $this->name . ' < (' . $names . ')';
         }
+
+        return $this->name . ' < (' . $names . ')';
     }
 
     /**

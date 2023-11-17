@@ -11,10 +11,12 @@ use PHPUnit\Framework\TestCase;
  * RoleManagerTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class RoleManagerTest extends TestCase
 {
-    public function testAddLink()
+    public function testAddLink(): void
     {
         $rm = new RoleManager(3);
 
@@ -25,7 +27,7 @@ class RoleManagerTest extends TestCase
         $this->assertTrue($res);
     }
 
-    public function testDeleteLink()
+    public function testDeleteLink(): void
     {
         $rm = new RoleManager(3);
 
@@ -44,7 +46,7 @@ class RoleManagerTest extends TestCase
         $this->assertFalse($res);
     }
 
-    public function testGetRoles()
+    public function testGetRoles(): void
     {
         $rm = new RoleManager(3);
 
@@ -65,7 +67,7 @@ class RoleManagerTest extends TestCase
         $this->assertEquals($rm->getRoles('u4'), ['g2', 'g3']);
     }
 
-    public function testGetUsers()
+    public function testGetUsers(): void
     {
         $rm = new RoleManager(3);
         $rm->addLink('u1', 'g1');
@@ -85,7 +87,7 @@ class RoleManagerTest extends TestCase
         $this->assertEquals($rm->getUsers('g3'), ['g1', 'u4']);
     }
 
-    public function testDomainPatternRole()
+    public function testDomainPatternRole(): void
     {
         $rm = new RoleManager(10);
         $rm->addDomainMatchingFunc('keyMatch2', function (string $key1, string $key2) {
@@ -118,7 +120,7 @@ class RoleManagerTest extends TestCase
         $this->assertEquals($rm->getRoles('u4', 'domain3'), ['g2']);
     }
 
-    public function testAllMatchingFunc()
+    public function testAllMatchingFunc(): void
     {
         $rm = new RoleManager(10);
         $rm->addMatchingFunc('keyMatch2', function (string $key1, string $key2) {
@@ -137,7 +139,7 @@ class RoleManagerTest extends TestCase
         $this->assertEquals($rm->hasLink('/book/2', 'book_group', 'domain1'), true);
     }
 
-    public function testMatchingFuncOrder()
+    public function testMatchingFuncOrder(): void
     {
         $rm = new RoleManager(10);
         $rm->addMatchingFunc('regexMatch', function (string $key1, string $key2) {

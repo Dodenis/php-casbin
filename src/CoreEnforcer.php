@@ -22,7 +22,6 @@ use Casbin\Rbac\RoleManager;
 use Casbin\Util\BuiltinOperations;
 use Casbin\Util\Util;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 /**
  * Class CoreEnforcer
@@ -63,14 +62,14 @@ class CoreEnforcer
     /**
      * Adapter.
      *
-     * @var Adapter|null
+     * @var null|Adapter
      */
     protected $adapter;
 
     /**
      * Watcher.
      *
-     * @var Watcher|null
+     * @var null|Watcher
      */
     protected $watcher;
 
@@ -133,6 +132,7 @@ class CoreEnforcer
     {
         $parsedParamLen = 0;
         $paramLen = \count($params);
+
         if ($paramLen >= 1) {
             if (\is_bool($enableLog = $params[$paramLen - 1])) {
                 $this->enableLog($enableLog);
@@ -142,8 +142,10 @@ class CoreEnforcer
 
         if (2 == $paramLen - $parsedParamLen) {
             $p0 = $params[0];
+
             if (\is_string($p0)) {
                 $p1 = $params[1];
+
                 if (\is_string($p1)) {
                     $this->initWithFile($p0, $p1);
                 } else {
@@ -152,12 +154,12 @@ class CoreEnforcer
             } else {
                 if (\is_string($params[1])) {
                     throw new CasbinException('Invalid parameters for enforcer.');
-                } else {
-                    $this->initWithModelAndAdapter($p0, $params[1]);
                 }
+                $this->initWithModelAndAdapter($p0, $params[1]);
             }
         } elseif (1 == $paramLen - $parsedParamLen) {
             $p0 = $params[0];
+
             if (\is_string($p0)) {
                 $this->initWithFile($p0, '');
             } else {
@@ -173,9 +175,6 @@ class CoreEnforcer
     /**
      * Initializes an enforcer with a model file and a policy file.
      *
-     * @param string $modelPath
-     * @param string $policyPath
-     *
      * @throws CasbinException
      */
     public function initWithFile(string $modelPath, string $policyPath): void
@@ -186,9 +185,6 @@ class CoreEnforcer
 
     /**
      * Initializes an enforcer with a database adapter.
-     *
-     * @param string $modelPath
-     * @param Adapter $adapter
      *
      * @throws CasbinException
      */
@@ -202,9 +198,6 @@ class CoreEnforcer
 
     /**
      * InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
-     *
-     * @param Model $m
-     * @param Adapter|null $adapter
      */
     public function initWithModelAndAdapter(Model $m, Adapter $adapter = null): void
     {
@@ -257,8 +250,6 @@ class CoreEnforcer
 
     /**
      * Gets the current model.
-     *
-     * @return Model
      */
     public function getModel(): Model
     {
@@ -267,8 +258,6 @@ class CoreEnforcer
 
     /**
      * Sets the current model.
-     *
-     * @param Model $model
      */
     public function setModel(Model $model): void
     {
@@ -280,8 +269,6 @@ class CoreEnforcer
 
     /**
      * Gets the current adapter.
-     *
-     * @return Adapter|null
      */
     public function getAdapter(): ?Adapter
     {
@@ -290,8 +277,6 @@ class CoreEnforcer
 
     /**
      * Sets the current adapter.
-     *
-     * @param Adapter $adapter
      */
     public function setAdapter(Adapter $adapter): void
     {
@@ -300,21 +285,17 @@ class CoreEnforcer
 
     /**
      * Sets the current watcher.
-     *
-     * @param Watcher $watcher
      */
     public function setWatcher(Watcher $watcher): void
     {
         $this->watcher = $watcher;
-        $this->watcher->setUpdateCallback(function () {
+        $this->watcher->setUpdateCallback(function (): void {
             $this->loadPolicy();
         });
     }
 
     /**
      * Gets the current role manager.
-     *
-     * @return RoleManager
      */
     public function getRoleManager(): RoleManager
     {
@@ -323,8 +304,6 @@ class CoreEnforcer
 
     /**
      * Gets the current role manager.
-     *
-     * @param RoleManager $rm
      */
     public function setRoleManager(RoleManager $rm): void
     {
@@ -333,8 +312,6 @@ class CoreEnforcer
 
     /**
      * Sets the current effector.
-     *
-     * @param Effector $eft
      */
     public function setEffector(Effector $eft): void
     {
@@ -360,7 +337,7 @@ class CoreEnforcer
         $newModel->clearPolicy();
 
         try {
-            if (!is_null($this->adapter)){
+            if (!is_null($this->adapter)) {
                 $this->adapter->loadPolicy($newModel);
             }
             $newModel->printPolicy();
@@ -369,6 +346,7 @@ class CoreEnforcer
 
             if ($this->autoBuildRoleLinks) {
                 $needToRebuild = true;
+
                 foreach ($this->rmMap as $rm) {
                     $rm->clear();
                 }
@@ -379,6 +357,7 @@ class CoreEnforcer
             // Ignore throw $e;
         } catch (\Throwable $e) {
             $flag = true;
+
             throw $e;
         } finally {
             if ($flag) {
@@ -408,6 +387,7 @@ class CoreEnforcer
         $this->model->sortPoliciesByPriority();
         $this->initRmMap();
         $this->model->printPolicy();
+
         if ($this->autoBuildRoleLinks) {
             $this->buildRoleLinks();
         }
@@ -431,7 +411,6 @@ class CoreEnforcer
      * LoadIncrementalFilteredPolicy append a filtered policy from file/database.
      *
      * @param mixed $filter
-     * @return void
      */
     public function loadIncrementalFilteredPolicy($filter): void
     {
@@ -440,8 +419,6 @@ class CoreEnforcer
 
     /**
      * Returns true if the loaded policy has been filtered.
-     *
-     * @return bool
      */
     public function isFiltered(): bool
     {
@@ -465,11 +442,11 @@ class CoreEnforcer
             throw new CasbinException('cannot save a filtered policy');
         }
 
-        if (!is_null($this->adapter)){
+        if (!is_null($this->adapter)) {
             $this->adapter->savePolicy($this->model);
-        }        
+        }
 
-        if ($this->watcher !== null && $this->autoNotifyWatcher) {
+        if (null !== $this->watcher && $this->autoNotifyWatcher) {
             if ($this->watcher instanceof WatcherEx) {
                 $this->watcher->updateForSavePolicy($this->model);
             } else {
@@ -480,8 +457,6 @@ class CoreEnforcer
 
     /**
      * initRmMap initializes rmMap.
-     *
-     * @return void
      */
     public function initRmMap(): void
     {
@@ -499,8 +474,6 @@ class CoreEnforcer
 
     /**
      * Changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
-     *
-     * @param bool $enabled
      */
     public function enableEnforce(bool $enabled = true): void
     {
@@ -509,8 +482,6 @@ class CoreEnforcer
 
     /**
      * Changes whether Casbin will log messages to the Logger.
-     *
-     * @param bool $enabled
      */
     public function enableLog(bool $enabled = true): void
     {
@@ -519,8 +490,6 @@ class CoreEnforcer
 
     /**
      * Controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
-     *
-     * @param bool $enabled
      */
     public function enableAutoNotifyWatcher(bool $enabled = true): void
     {
@@ -529,8 +498,6 @@ class CoreEnforcer
 
     /**
      * Controls whether to save a policy rule automatically to the adapter when it is added or removed.
-     *
-     * @param bool $autoSave
      */
     public function enableAutoSave(bool $autoSave = true): void
     {
@@ -539,8 +506,6 @@ class CoreEnforcer
 
     /**
      * Controls whether to rebuild the role inheritance relations when a role is added or deleted.
-     *
-     * @param bool $autoBuildRoleLinks
      */
     public function enableAutoBuildRoleLinks(bool $autoBuildRoleLinks = true): void
     {
@@ -563,11 +528,8 @@ class CoreEnforcer
      * Use a custom matcher to decides whether a "subject" can access a "object" with the operation "action",
      * input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
      *
-     * @param string $matcher
      * @param array $explains
      * @param mixed ...$rvals
-     *
-     * @return bool
      *
      * @throws CasbinException
      */
@@ -590,10 +552,10 @@ class CoreEnforcer
             throw new CasbinException('model is undefined');
         }
 
-        $rType = "r";
-        $pType = "p";
-        $eType = "e";
-        $mType = "m";
+        $rType = 'r';
+        $pType = 'p';
+        $eType = 'e';
+        $mType = 'm';
 
         switch (true) {
             case $rvals[0] instanceof EnforceContext:
@@ -603,12 +565,15 @@ class CoreEnforcer
                 $eType = $enforceContext->eType;
                 $mType = $enforceContext->mType;
                 array_shift($rvals);
+
                 break;
+
             default:
                 break;
         }
 
         $expString = '';
+
         if ('' === $matcher) {
             $expString = $this->model['m'][$mType]->value;
         } else {
@@ -628,7 +593,7 @@ class CoreEnforcer
         }
 
         $expressionLanguage = $this->getExpressionLanguage($functions);
-        $expression = "";
+        $expression = '';
 
         $hasEval = Util::hasEval($expString);
 
@@ -643,9 +608,11 @@ class CoreEnforcer
         $explainIndex = 0;
 
         $policyLen = \count($this->model['p'][$pType]->policy);
-        if (0 != $policyLen && (strpos($expString, $pType . '_') !== false)) {
+
+        if (0 != $policyLen && (false !== strpos($expString, $pType . '_'))) {
             foreach ($this->model['p'][$pType]->policy as $policyIndex => $pvals) {
                 $parameters = array_combine($pTokens, $pvals);
+
                 if (false == $parameters) {
                     throw new CasbinException('invalid policy size');
                 }
@@ -654,6 +621,7 @@ class CoreEnforcer
                     $ruleNames = Util::getEvalValue($expString);
                     $replacements = [];
                     $pTokens_flipped = array_flip($pTokens);
+
                     foreach ($ruleNames as $ruleName) {
                         if (isset($pTokens_flipped[$ruleName])) {
                             $rule = Util::escapeAssertion($pvals[$pTokens_flipped[$ruleName]]);
@@ -672,19 +640,22 @@ class CoreEnforcer
 
                 // set to no-match at first
                 $matcherResults[$policyIndex] = 0;
+
                 if (\is_bool($result)) {
                     if ($result) {
                         $matcherResults[$policyIndex] = 1;
                     }
                 } elseif (\is_float($result)) {
-                    if ($result != 0) {
+                    if (0 != $result) {
                         $matcherResults[$policyIndex] = 1;
                     }
                 } else {
                     throw new CasbinException('matcher result should be bool, int or float');
                 }
+
                 if (isset($parameters[$pType . '_eft'])) {
                     $eft = $parameters[$pType . '_eft'];
+
                     if ('allow' == $eft) {
                         $policyEffects[$policyIndex] = Effector::ALLOW;
                     } elseif ('deny' == $eft) {
@@ -697,18 +668,20 @@ class CoreEnforcer
                 }
 
                 list($effect, $explainIndex) = $this->eft->mergeEffects($this->model['e'][$eType]->value, $policyEffects, $matcherResults, $policyIndex, $policyLen);
-                if ($effect != Effector::INDETERMINATE) {
+
+                if (Effector::INDETERMINATE != $effect) {
                     break;
                 }
             }
         } else {
             if ($hasEval) {
-                throw new EvalFunctionException("please make sure rule exists in policy when using eval() in matcher");
+                throw new EvalFunctionException('please make sure rule exists in policy when using eval() in matcher');
             }
 
             $matcherResults[0] = 1;
 
             $parameters = $rParameters;
+
             foreach ($this->model['p'][$pType]->tokens as $token) {
                 $parameters[$token] = '';
             }
@@ -724,13 +697,13 @@ class CoreEnforcer
             list($effect, $explainIndex) = $this->eft->mergeEffects($this->model['e'][$eType]->value, $policyEffects, $matcherResults, 0, 1);
         }
 
-        if ($explains !== null) {
-            if (($explainIndex != -1) && (count($this->model['p'][$pType]->policy) > $explainIndex)) {
+        if (null !== $explains) {
+            if ((-1 != $explainIndex) && (count($this->model['p'][$pType]->policy) > $explainIndex)) {
                 $explains = $this->model['p'][$pType]->policy[$explainIndex];
             }
         }
 
-        $result = $effect == Effector::ALLOW;
+        $result = Effector::ALLOW == $effect;
 
         if (Log::getLogger()->isEnabled()) {
             $reqStr = 'Request: ';
@@ -739,6 +712,7 @@ class CoreEnforcer
             $reqStr .= sprintf(" ---> %s\n", var_export($result, true));
 
             $reqStr = 'Hit Policy: ';
+
             if (count($explains) == count($explains, COUNT_RECURSIVE)) {
                 // if $explains is not multidimensional
                 $reqStr .= sprintf("%s \n", '[' . implode(', ', $explains) . ']');
@@ -754,14 +728,10 @@ class CoreEnforcer
         return $result;
     }
 
-    /**
-     * @param array $functions
-     *
-     * @return ExpressionLanguage
-     */
     protected function getExpressionLanguage(array $functions): ExpressionLanguage
     {
         $expressionLanguage = new ExpressionLanguage();
+
         foreach ($functions as $key => $func) {
             $expressionLanguage->register($key, function (...$args) use ($key) {
                 return sprintf($key . '(%1$s)', implode(',', $args));
@@ -773,11 +743,6 @@ class CoreEnforcer
         return $expressionLanguage;
     }
 
-    /**
-     * @param string $expString
-     *
-     * @return string
-     */
     protected function getExpString(string $expString): string
     {
         return preg_replace_callback(
@@ -794,13 +759,12 @@ class CoreEnforcer
      *
      * @param mixed ...$rvals
      *
-     * @return bool
-     *
      * @throws CasbinException
      */
     public function enforce(...$rvals): bool
     {
         $explains = [];
+
         return $this->enforcing('', $explains, ...$rvals);
     }
 
@@ -808,105 +772,99 @@ class CoreEnforcer
      * Use a custom matcher to decides whether a "subject" can access a "object" with the operation "action",
      * input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
      *
-     * @param string $matcher
      * @param mixed ...$rvals
-     *
-     * @return bool
      *
      * @throws CasbinException
      */
     public function enforceWithMatcher(string $matcher, ...$rvals): bool
     {
         $explains = [];
+
         return $this->enforcing($matcher, $explains, ...$rvals);
     }
 
     /**
-     * EnforceEx explain enforcement by informing matched rules
+     * EnforceEx explain enforcement by informing matched rules.
      *
      * @param mixed ...$rvals
+     *
      * @return array
      */
     public function enforceEx(...$rvals)
     {
         $explain = [];
-        $result = $this->enforcing("", $explain, ...$rvals);
+        $result = $this->enforcing('', $explain, ...$rvals);
+
         return [$result, $explain];
     }
 
     /**
      * BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
      *
-     * @param integer $op policy operations.
-     * @param string $ptype policy type.
-     * @param string[][] $rules the rules.
-     * @return void
+     * @param int        $op    policy operations
+     * @param string     $ptype policy type
+     * @param string[][] $rules the rules
      */
     public function buildIncrementalRoleLinks(int $op, string $ptype, array $rules): void
     {
-        $this->model->buildIncrementalRoleLinks($this->rmMap, $op, "g", $ptype, $rules);
+        $this->model->buildIncrementalRoleLinks($this->rmMap, $op, 'g', $ptype, $rules);
     }
 
     /**
-     * BatchEnforce enforce in batches
+     * BatchEnforce enforce in batches.
      *
      * @param string[][] $requests
+     *
      * @return bool[]
      */
     public function batchEnforce(array $requests): array
     {
         return array_map(function (array $request) {
-            return  $this->enforce(...$request);
+            return $this->enforce(...$request);
         }, $requests);
     }
 
     /**
-     * BatchEnforceWithMatcher enforce with matcher in batches
+     * BatchEnforceWithMatcher enforce with matcher in batches.
      *
-     * @param string $matcher
      * @param string[][] $requests
+     *
      * @return bool[]
      */
     public function batchEnforceWithMatcher(string $matcher, array $requests): array
     {
         return array_map(function (array $request) use ($matcher) {
-            return  $this->enforceWithMatcher($matcher, ...$request);
+            return $this->enforceWithMatcher($matcher, ...$request);
         }, $requests);
     }
 
     /**
-     * AddNamedMatchingFunc add MatchingFunc by ptype RoleManager
-     *
-     * @param string $ptype
-     * @param string $name
-     * @param \Closure $fn
-     * @return boolean
+     * AddNamedMatchingFunc add MatchingFunc by ptype RoleManager.
      */
     public function addNamedMatchingFunc(string $ptype, string $name, \Closure $fn): bool
     {
         if (isset($this->rmMap[$ptype])) {
             $rm = $this->rmMap[$ptype];
             $rm->addMatchingFunc($name, $fn);
+
             return true;
         }
+
         return false;
     }
 
     /**
-     * AddNamedDomainMatchingFunc add MatchingFunc by ptype to RoleManager
-     *
-     * @param string $ptype
-     * @param string $name
-     * @param \Closure $fn
-     * @return boolean
+     * AddNamedDomainMatchingFunc add MatchingFunc by ptype to RoleManager.
      */
     public function addNamedDomainMatchingFunc(string $ptype, string $name, \Closure $fn): bool
     {
         if (isset($this->rmMap[$ptype])) {
             $rm = $this->rmMap[$ptype];
             $rm->addDomainMatchingFunc($name, $fn);
+
             return true;
         }
+
         return false;
     }
 }
