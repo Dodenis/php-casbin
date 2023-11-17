@@ -10,7 +10,6 @@ g, adminrole, perm3, *
 g, adminrole, perm4, *
 g, readerrole, perm1, *
 g, readerrole, perm3, *
-g, readerrole, perm797, *
 
 g, admingroup, adminrole, *
 g, readergroup, readerrole, *

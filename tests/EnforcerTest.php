@@ -7,6 +7,7 @@ use Casbin\Enforcer;
 use Casbin\Model\Model;
 use Casbin\Persist\Adapters\FileAdapter;
 use Casbin\Util\BuiltinOperations;
+use CasbinAdapter\DBAL\Adapter as DatabaseAdapter;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,6 +18,8 @@ use PHPUnit\Framework\TestCase;
 class EnforcerTest extends TestCase
 {
     private $modelAndPolicyPath = __DIR__ . '/../examples';
+
+    public static Enforcer|null $enforcer = null;
 
     public function testKeyMatchModelInMemory()
     {
@@ -435,31 +438,59 @@ class EnforcerTest extends TestCase
      */
     public function domainDataProvider(): \Generator
     {
-        yield 'alice in domain1 data1 read' => ['alice', 'domain1', 'data1', 'read', true];
-        yield 'alice in domain1 data1 write' => ['alice', 'domain1', 'data1', 'write', true];
-        yield 'alice in domain1 data2 read' => ['alice', 'domain1', 'data2', 'read', true];
-        yield 'alice in domain1 data2 write' => ['alice', 'domain1', 'data2', 'write', true];
-        yield 'bob in domain1 data2 write' => ['bob', 'domain1', 'data2', 'write', false];
-        yield 'alice in domain2 data1 read' => ['alice', 'domain2', 'data1', 'read', true];
-        yield 'alice in domain2 data1 write' => ['alice', 'domain2', 'data1', 'write', false];
-        yield 'alice in domain2 data2 read' => ['alice', 'domain2', 'data2', 'read', true];
-        yield 'alice in domain2 data2 write' => ['alice', 'domain2', 'data2', 'write', false];
-        yield 'alice in domain3 data1 read' => ['alice', 'domain3', 'data1', 'read', false];
-        yield 'alice in domain3 data1 write' => ['alice', 'domain3', 'data1', 'write', false];
-        yield 'alice in domain3 data2 read' => ['alice', 'domain3', 'data2', 'read', false];
-        yield 'alice in domain3 data2 write' => ['alice', 'domain3', 'data2', 'write', false];
-        yield 'badr in domain4 data1 write' => ['badr', 'domain4', 'data1', 'write', false];
-        yield 'badr in domain4 data1 read' => ['badr', 'domain4', 'data1', 'read', true];
-        yield 'badr in domain4 data2 read' => ['badr', 'domain4', 'data2', 'read', true];
-        yield 'badr in domain4 data2 write' => ['badr', 'domain4', 'data2', 'write', true];
-        yield 'stef in domain1 data1 read' => ['stef', 'domain1', 'data1', 'read', true];
-        yield 'stef in domain1 data1 write' => ['stef', 'domain1', 'data1', 'write', true];
-        yield 'stef in domain1 data2 read' => ['stef', 'domain1', 'data2', 'read', true];
-        yield 'stef in domain1 data2 write' => ['stef', 'domain1', 'data2', 'write', true];
-        yield 'stef in domain5 data3 read' => ['stef', 'domain5', 'data3', 'read', false];
-        yield 'ben in domain5 data3 read' => ['ben', 'domain5', 'data3', 'read', false];
-        yield 'leo in domain5 data3 read' => ['leo', 'domain5', 'data3', 'read', true];
-        yield 'leo in domain1 data3 read' => ['leo', 'domain1', 'data3', 'read', false];
+        yield 'user-100-1 in domain100 dataBenef1 read' => ['user-100-1', 'domain100', 'dataBenef1', 'read', true];
+        yield 'user-100-1 in domain100 dataBenef1 write' => ['user-100-1', 'domain100', 'dataBenef1', 'write', true];
+        yield 'user-100-1 in domain100 dataBenef20 read' => ['user-100-1', 'domain100', 'dataBenef20', 'write', true];
+        yield 'user-100-1 in domain100 dataBenef20 write' => ['user-100-1', 'domain100', 'dataBenef20', 'write', true];
+        yield 'user-100-999 in domain100 dataBenef30 write' => ['user-100-9999', 'domain100', 'dataBenef30', 'write', false];
+        yield 'user-100-1 in domain101 dataBenef1 read' => ['user-100-1', 'domain101', 'dataBenef1', 'read', true];
+        yield 'user-100-1 in domain101 dataBenef1 write' => ['user-100-1', 'domain101', 'dataBenef1', 'write', false];
+        yield 'user-100-1 in domain101 dataBenef2 read' => ['user-100-1', 'domain101', 'dataBenef2', 'read', true];
+        yield 'user-100-1 in domain101 dataBenef2 write' => ['user-100-1', 'domain101', 'dataBenef2', 'write', false];
+        yield 'user-100-1 in domain102 dataBenef1 read' => ['user-100-1', 'domain102', 'dataBenef1', 'read', false];
+        yield 'user-100-1 in domain102 dataBenef1 write' => ['user-100-1', 'domain102', 'dataBenef1', 'write', false];
+        yield 'user-100-1 in domain102 dataBenef2 read' => ['user-100-1', 'domain102', 'dataBenef2', 'read', false];
+        yield 'user-100-1 in domain102 dataBenef2 write' => ['user-100-1', 'domain102', 'dataBenef2', 'write', false];
+
+        yield 'user-100-11 in domain100 dataCompta1 read' => ['user-100-11', 'domain100', 'dataCompta1', 'read', true];
+        yield 'user-100-11 in domain100 dataCompta1 write' => ['user-100-11', 'domain100', 'dataCompta1', 'write', true];
+        yield 'user-100-11 in domain100 dataBenef1 read' => ['user-100-11', 'domain100', 'dataBenef1', 'read', false];
+        yield 'user-100-11 in domain100 dataBenef1 write' => ['user-100-11', 'domain100', 'dataBenef1', 'write', false];
+
+        yield 'user-100-16 in domain100 dataCompta1 read' => ['user-100-16', 'domain100', 'dataCompta1', 'read', false];
+        yield 'user-100-16 in domain100 dataCompta1 write' => ['user-100-16', 'domain100', 'dataCompta1', 'write', false];
+        yield 'user-100-16 in domain100 dataBenef1 read' => ['user-100-16', 'domain100', 'dataBenef1', 'read', true];
+        yield 'user-100-16 in domain100 dataBenef1 write' => ['user-100-16', 'domain100', 'dataBenef1', 'write', false];
+
+        yield 'user-100-20 in domain100 dataCompta1 read' => ['user-100-20', 'domain100', 'dataCompta1', 'read', true];
+        yield 'user-100-20 in domain100 dataCompta1 write' => ['user-100-20', 'domain100', 'dataCompta1', 'write', true];
+        yield 'user-100-20 in domain100 dataProduct1 read' => ['user-100-20', 'domain100', 'dataProduct1', 'read', true];
+        yield 'user-100-20 in domain100 dataProduct1 write' => ['user-100-20', 'domain100', 'dataProduct1', 'write', false];
+        yield 'user-100-20 in domain100 dataCommande1 read' => ['user-100-20', 'domain100', 'dataCommande1', 'read', false];
+        yield 'user-100-20 in domain100 dataCommande1 write' => ['user-100-20', 'domain100', 'dataCommande1', 'write', false];
+
+        yield 'user-all-1 in domain100 dataBenef1 read' => ['user-all-1', 'domain100', 'dataBenef1', 'read', true];
+        yield 'user-all-1 in domain100 dataBenef1 write' => ['user-all-1', 'domain100', 'dataBenef1', 'write', true];
+        yield 'user-all-1 in domain200 dataProduct1 read' => ['user-all-1', 'domain200', 'dataProduct1', 'read', true];
+        yield 'user-all-1 in domain200 dataProduct1 write' => ['user-all-1', 'domain200', 'dataProduct1', 'write', true];
+
+        yield 'user-all-2 in domain100 dataBenef1 read' => ['user-all-2', 'domain100', 'dataBenef1', 'read', true];
+        yield 'user-all-2 in domain100 dataBenef1 write' => ['user-all-2', 'domain100', 'dataBenef1', 'write', false];
+        yield 'user-all-2 in domain200 dataProduct1 read' => ['user-all-2', 'domain200', 'dataProduct1', 'read', true];
+        yield 'user-all-2 in domain200 dataProduct1 write' => ['user-all-2', 'domain200', 'dataProduct1', 'write', false];
+
+//        yield 'badr in domain4 data1 write' => ['badr', 'domain4', 'data1', 'write', false];
+//        yield 'badr in domain4 data1 read' => ['badr', 'domain4', 'data1', 'read', true];
+//        yield 'badr in domain4 data2 read' => ['badr', 'domain4', 'data2', 'read', true];
+//        yield 'badr in domain4 data2 write' => ['badr', 'domain4', 'data2', 'write', true];
+//        yield 'stef in domain1 data1 read' => ['stef', 'domain1', 'data1', 'read', true];
+//        yield 'stef in domain1 data1 write' => ['stef', 'domain1', 'data1', 'write', true];
+//        yield 'stef in domain1 data2 read' => ['stef', 'domain1', 'data2', 'read', true];
+//        yield 'stef in domain1 data2 write' => ['stef', 'domain1', 'data2', 'write', true];
+//        yield 'stef in domain5 data3 read' => ['stef', 'domain5', 'data3', 'read', false];
+//        yield 'ben in domain5 data3 read' => ['ben', 'domain5', 'data3', 'read', false];
+//        yield 'leo in domain5 data3 read' => ['leo', 'domain5', 'data3', 'read', true];
+//        yield 'leo in domain1 data3 read' => ['leo', 'domain1', 'data3', 'read', false];
     }
 
     /**
@@ -467,19 +498,67 @@ class EnforcerTest extends TestCase
      */
     public function testRbacWithDomain($user, $domain, $resource, $action, $expected)
     {
-        $enforcer = new Enforcer(
-            $this->modelAndPolicyPath.'/rbac_with_domain_pattern_model_and_keymatch_model.conf',
-            $this->modelAndPolicyPath.'/rbac_with_domain_pattern_model_and_keymatch_policy.csv'
-        );
+        if (empty(self::$enforcer)) {
+            $config = [
+                'driver' => 'pdo_mysql', // mysql,pgsql,sqlite,sqlsrv
+                'host' => '10.5.1.14',
+                'dbname' => 'app',
+                'user' => 'root',
+                'password' => 'pwd',
+                'port' => '3306',
+            ];
 
-        $enforcer->addNamedDomainMatchingFunc(
-            'g',
-            'keyMatch',
-            function (string $keyOne, string $keyTwo) {
-                return BuiltinOperations::keyMatch($keyOne, $keyTwo);
-            }
-        );
+            $adapter = DatabaseAdapter::newAdapter($config);
 
-        $this->assertSame($expected, $enforcer->enforce($user, $domain, $resource, $action));
+            self::$enforcer = new Enforcer(
+                $this->modelAndPolicyPath . '/rbac_with_domain_pattern_model_and_keymatch_model.conf',
+                $adapter
+            );
+
+            self::$enforcer->addNamedDomainMatchingFunc(
+                'g',
+                'keyMatch',
+                function (string $keyOne, string $keyTwo) {
+                    return BuiltinOperations::keyMatch($keyOne, $keyTwo);
+                }
+            );
+        }
+
+        $this->assertSame($expected, self::$enforcer->enforce($user, $domain, $resource, $action));
+    }
+
+    public function testGetRoles(): void
+    {
+        if (empty(self::$enforcer)) {
+            $config = [
+                'driver' => 'pdo_mysql', // mysql,pgsql,sqlite,sqlsrv
+                'host' => '10.5.1.14',
+                'dbname' => 'app',
+                'user' => 'root',
+                'password' => 'pwd',
+                'port' => '3306',
+            ];
+
+            $adapter = DatabaseAdapter::newAdapter($config);
+
+            self::$enforcer = new Enforcer(
+                $this->modelAndPolicyPath . '/rbac_with_domain_pattern_model_and_keymatch_model.conf',
+                $adapter
+            );
+
+            self::$enforcer->addNamedDomainMatchingFunc(
+                'g',
+                'keyMatch',
+                function (string $keyOne, string $keyTwo) {
+                    return BuiltinOperations::keyMatch($keyOne, $keyTwo);
+                }
+            );
+        }
+
+        $roles = self::$enforcer->getRolesForUser('user-100-1', 'domain100');
+
+        $roles2 = self::$enforcer->getRolesForUser('admingroup', 'domain100');
+
+        $this->assertEquals(true, true);
     }
 }

@@ -7,6 +7,7 @@
             "email": "techlee@qq.com"
         }
     ],
+    "version": "v3.21.3",
     "license": "Apache-2.0",
     "keywords": [        
         "casbin",
@@ -20,7 +21,9 @@
     "require": {
         "php": ">=7.1.0",
         "symfony/expression-language": "^3.4|^4.0|^5.0|^6.0",
-        "s1lentium/iptools": "^1.1"
+        "s1lentium/iptools": "^1.1",
+        "casbin/database-adapter": "^1.8",
+        "casbin/dbal-adapter": "^2.3"
     },
     "autoload": {
         "psr-4": {
