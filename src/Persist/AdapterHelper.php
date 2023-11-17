@@ -17,9 +17,6 @@ trait AdapterHelper
 {
     /**
      * Loads a text line as a policy rule to model.
-     *
-     * @param string $line
-     * @param Model $model
      */
     public function loadPolicyLine(string $line, Model $model): void
     {
@@ -31,8 +28,8 @@ trait AdapterHelper
             return;
         }
 
-        $tokens = array_map(function($item){
-            return trim(is_null($item) ? "" : $item);
+        $tokens = array_map(function ($item) {
+            return trim(is_null($item) ? '' : $item);
         }, str_getcsv($line));
 
         $this->loadPolicyArray($tokens, $model);
@@ -42,7 +39,6 @@ trait AdapterHelper
      * Loads a policy rule to model.
      *
      * @param array<string> $rule
-     * @param Model $model
      */
     public function loadPolicyArray(array $rule, Model $model): void
     {
@@ -55,7 +51,8 @@ trait AdapterHelper
 
         $assertions = $model[$sec];
         $assertion = $assertions[$key];
-        if (!($assertion instanceof Assertion)) {
+
+        if (!$assertion instanceof Assertion) {
             return;
         }
 

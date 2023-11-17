@@ -14,13 +14,12 @@ use Casbin\Util\Util;
  * Class Model.
  * Represents the whole access control model.
  *
- * @package Casbin\Model
  * @author techlee@qq.com
  */
 class Model extends Policy
 {
-    const DEFAULT_DOMAIN = '';
-    const DEFAULT_SEPARATOR = '::';
+    public const DEFAULT_DOMAIN = '';
+    public const DEFAULT_SEPARATOR = '::';
 
     /**
      * @var array<string, string>
@@ -33,14 +32,13 @@ class Model extends Policy
         'm' => 'matchers',
     ];
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function __clone()
     {
         $this->sectionNameMap = $this->sectionNameMap;
         $newAstMap = [];
+
         foreach ($this->items as $ptype => $ast) {
             foreach ($ast as $i => $v) {
                 $newAstMap[$ptype][$i] = clone $v;
@@ -50,11 +48,6 @@ class Model extends Policy
     }
 
     /**
-     * @param ConfigContract $cfg
-     * @param string $sec
-     * @param string $key
-     *
-     * @return bool
      * @throws CasbinException
      */
     private function loadAssertion(ConfigContract $cfg, string $sec, string $key): bool
@@ -67,11 +60,6 @@ class Model extends Policy
     /**
      * Adds an assertion to the model.
      *
-     * @param string $sec
-     * @param string $key
-     * @param string $value
-     *
-     * @return bool
      * @throws CasbinException
      */
     public function addDef(string $sec, string $key, string $value): bool
@@ -87,6 +75,7 @@ class Model extends Policy
 
         if ('r' == $sec || 'p' == $sec) {
             $ast->tokens = explode(',', $ast->value);
+
             foreach ($ast->tokens as $i => $token) {
                 $ast->tokens[$i] = $key . '_' . trim($token);
             }
@@ -99,41 +88,32 @@ class Model extends Policy
         return true;
     }
 
-    /**
-     * @param int $i
-     *
-     * @return string
-     */
     private function getKeySuffix(int $i): string
     {
         if (1 == $i) {
             return '';
         }
 
-        return (string)$i;
+        return (string) $i;
     }
 
     /**
-     * @param ConfigContract $cfg
-     * @param string $sec
      * @throws CasbinException
      */
     private function loadSection(ConfigContract $cfg, string $sec): void
     {
         $i = 1;
-        for (; ;) {
+
+        while (true) {
             if (!$this->loadAssertion($cfg, $sec, $sec . $this->getKeySuffix($i))) {
                 break;
-            } else {
-                ++$i;
             }
+            ++$i;
         }
     }
 
     /**
      * Creates an empty model.
-     *
-     * @return Model
      */
     public static function newModel(): self
     {
@@ -143,9 +123,6 @@ class Model extends Policy
     /**
      * Creates a model from a .CONF file.
      *
-     * @param string $path
-     *
-     * @return Model
      * @throws CasbinException
      */
     public static function newModelFromFile(string $path): self
@@ -160,9 +137,6 @@ class Model extends Policy
     /**
      * Creates a model from a string which contains model text.
      *
-     * @param string $text
-     *
-     * @return Model
      * @throws CasbinException
      */
     public static function newModelFromString(string $text): self
@@ -177,7 +151,6 @@ class Model extends Policy
     /**
      * Loads the model from model CONF file.
      *
-     * @param string $path
      * @throws CasbinException
      */
     public function loadModel(string $path): void
@@ -195,7 +168,6 @@ class Model extends Policy
     /**
      * Loads the model from the text.
      *
-     * @param string $text
      * @throws CasbinException
      */
     public function loadModelFromText(string $text): void
@@ -216,6 +188,7 @@ class Model extends Policy
     public function printModel(): void
     {
         Log::logPrint('Model:');
+
         foreach ($this->items as $k => $v) {
             foreach ($v as $i => $j) {
                 Log::logPrintf('%s.%s: %s', $k, $i, $j->value);
@@ -225,8 +198,6 @@ class Model extends Policy
 
     /**
      * Loads an initial function map.
-     *
-     * @return FunctionMap
      */
     public static function loadFunctionMap(): FunctionMap
     {
@@ -243,20 +214,24 @@ class Model extends Policy
         $subjectHierarchyMap = [];
         // Tree structure of role
         $policyMap = [];
+
         foreach ($policies as $policy) {
             if (count($policy) < 2) {
                 throw new CasbinException('policy g expect 2 more params');
             }
             $domain = self::DEFAULT_DOMAIN;
-            if (count($policy) != 2) {
+
+            if (2 != count($policy)) {
                 $domain = $policy[2];
             }
             $child = $this->getNameWithDomain($domain, $policy[0]);
             $parent = $this->getNameWithDomain($domain, $policy[1]);
             $policyMap[$parent][] = $child;
+
             if (!isset($subjectHierarchyMap[$child])) {
                 $subjectHierarchyMap[$child] = 0;
             }
+
             if (!isset($subjectHierarchyMap[$parent])) {
                 $subjectHierarchyMap[$parent] = 0;
             }
@@ -264,28 +239,33 @@ class Model extends Policy
         }
         // Use queues for levelOrder
         $queue = [];
+
         foreach ($subjectHierarchyMap as $k => $v) {
             $root = $k;
-            if ($v != 0) {
+
+            if (0 != $v) {
                 continue;
             }
             $lv = 0;
             $queue[] = $root;
-            while (count($queue) != 0) {
+
+            while (0 != count($queue)) {
                 $sz = count($queue);
-                for ($i = 0; $i < $sz; $i++) {
+
+                for ($i = 0; $i < $sz; ++$i) {
                     $node = $queue[array_key_first($queue)];
                     unset($queue[array_key_first($queue)]);
 
                     $nodeValue = $node;
                     $subjectHierarchyMap[$nodeValue] = $lv;
+
                     if (isset($policyMap[$nodeValue])) {
                         foreach ($policyMap[$nodeValue] as $child) {
                             $queue[] = $child;
                         }
                     }
                 }
-                $lv++;
+                ++$lv;
             }
         }
 
@@ -294,15 +274,17 @@ class Model extends Policy
 
     public function sortPoliciesBySubjectHierarchy(): void
     {
-        if ($this->items['e']['e']->value != 'subjectPriority(p_eft) || deny') {
+        if ('subjectPriority(p_eft) || deny' != $this->items['e']['e']->value) {
             return;
         }
         $subIndex = 0;
         $domainIndex = -1;
+
         foreach ($this->items['p'] as $ptype => $assertion) {
             foreach ($assertion->tokens as $index => $token) {
                 if ($token == sprintf('%s_dom', $ptype)) {
                     $domainIndex = $index;
+
                     break;
                 }
             }
@@ -312,7 +294,8 @@ class Model extends Policy
             usort($policies, function ($i, $j) use ($subIndex, $domainIndex, $subjectHierarchyMap): int {
                 $domain1 = self::DEFAULT_DOMAIN;
                 $domain2 = self::DEFAULT_DOMAIN;
-                if ($domainIndex != -1) {
+
+                if (-1 != $domainIndex) {
                     $domain1 = $i[$domainIndex];
                     $domain2 = $j[$domainIndex];
                 }
@@ -325,6 +308,7 @@ class Model extends Policy
                 if ($p1 == $p2) {
                     return 0;
                 }
+
                 return ($p1 > $p2) ? -1 : 1;
             });
 
@@ -337,8 +321,9 @@ class Model extends Policy
     public function sortPoliciesByPriority(): void
     {
         foreach ($this->items['p'] as $ptype => $assertion) {
-            $index = array_search(sprintf("%s_priority", $ptype), $assertion->tokens);
-            if ($index !== false) {
+            $index = array_search(sprintf('%s_priority', $ptype), $assertion->tokens);
+
+            if (false !== $index) {
                 $assertion->priorityIndex = intval($index);
             } else {
                 continue;
@@ -347,11 +332,14 @@ class Model extends Policy
             usort($policies, function ($i, $j) use ($assertion): int {
                 $p1 = $i[$assertion->priorityIndex];
                 $p2 = $j[$assertion->priorityIndex];
+
                 if ($p1 == $p2) {
                     return 0;
                 }
+
                 return ($p1 < $p2) ? -1 : 1;
             });
+
             foreach ($assertion->policy as $i => $policy) {
                 $assertion->policyMap[implode(',', $policy)] = $i;
             }

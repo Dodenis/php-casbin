@@ -19,9 +19,6 @@ use Casbin\Persist\WatcherUpdatable;
  */
 class InternalEnforcer extends CoreEnforcer
 {
-    /**
-     * @return bool
-     */
     protected function shouldPersist(): bool
     {
         return !is_null($this->adapter) && $this->autoSave;
@@ -29,12 +26,6 @@ class InternalEnforcer extends CoreEnforcer
 
     /**
      * Adds a rule to the current policy.
-     *
-     * @param string $sec
-     * @param string $ptype
-     * @param array $rule
-     *
-     * @return bool
      */
     protected function addPolicyInternal(string $sec, string $ptype, array $rule): bool
     {
@@ -51,11 +42,11 @@ class InternalEnforcer extends CoreEnforcer
 
         $this->model->addPolicy($sec, $ptype, $rule);
 
-        if ($sec == "g") {
+        if ('g' == $sec) {
             $this->buildIncrementalRoleLinks(Policy::POLICY_ADD, $ptype, [$rule]);
         }
 
-        if ($this->watcher !== null && $this->autoNotifyWatcher) {
+        if (null !== $this->watcher && $this->autoNotifyWatcher) {
             if ($this->watcher instanceof WatcherEx) {
                 $this->watcher->updateForAddPolicy($sec, $ptype, ...$rule);
             } else {
@@ -69,11 +60,6 @@ class InternalEnforcer extends CoreEnforcer
     /**
      * Adds rules to the current policy.
      *
-     * @param string $sec
-     * @param string $ptype
-     * @param array $rules
-     *
-     * @return bool
      * @throws Exceptions\CasbinException
      */
     protected function addPoliciesInternal(string $sec, string $ptype, array $rules): bool
@@ -91,11 +77,11 @@ class InternalEnforcer extends CoreEnforcer
 
         $this->model->addPolicies($sec, $ptype, $rules);
 
-        if ($sec == "g") {
+        if ('g' == $sec) {
             $this->buildIncrementalRoleLinks(Policy::POLICY_ADD, $ptype, $rules);
         }
 
-        if ($this->watcher !== null && $this->autoNotifyWatcher) {
+        if (null !== $this->watcher && $this->autoNotifyWatcher) {
             $this->watcher->update();
         }
 
@@ -103,12 +89,8 @@ class InternalEnforcer extends CoreEnforcer
     }
 
     /**
-     * @param string $sec
-     * @param string $ptype
      * @param string[] $oldRule
      * @param string[] $newRule
-     *
-     * @return bool
      */
     protected function updatePolicyInternal(string $sec, string $ptype, array $oldRule, array $newRule): bool
     {
@@ -120,11 +102,12 @@ class InternalEnforcer extends CoreEnforcer
         }
 
         $ruleUpdated = $this->model->updatePolicy($sec, $ptype, $oldRule, $newRule);
+
         if (!$ruleUpdated) {
             return false;
         }
 
-        if ($sec == "g") {
+        if ('g' == $sec) {
             // remove the old rule
             $this->buildIncrementalRoleLinks(Policy::POLICY_REMOVE, $ptype, [$oldRule]);
 
@@ -132,7 +115,7 @@ class InternalEnforcer extends CoreEnforcer
             $this->buildIncrementalRoleLinks(Policy::POLICY_ADD, $ptype, [$newRule]);
         }
 
-        if ($this->watcher !== null && $this->autoNotifyWatcher) {
+        if (null !== $this->watcher && $this->autoNotifyWatcher) {
             try {
                 if ($this->watcher instanceof WatcherUpdatable) {
                     $this->watcher->updateForUpdatePolicy($oldRule, $newRule);
@@ -140,7 +123,8 @@ class InternalEnforcer extends CoreEnforcer
                     $this->watcher->update();
                 }
             } catch (\Exception $e) {
-                Log::logPrint("An exception occurred:" . $e->getMessage());
+                Log::logPrint('An exception occurred:' . $e->getMessage());
+
                 return false;
             }
         }
@@ -156,13 +140,14 @@ class InternalEnforcer extends CoreEnforcer
             } catch (NotImplementedException $e) {
             }
         }
-    
+
         $ruleUpdated = $this->model->updatePolicies($sec, $ptype, $oldRules, $newRules);
+
         if (!$ruleUpdated) {
             return false;
         }
 
-        if ($sec == "g") {
+        if ('g' == $sec) {
             // remove the old rule
             $this->buildIncrementalRoleLinks(Policy::POLICY_REMOVE, $ptype, $oldRules);
 
@@ -170,7 +155,7 @@ class InternalEnforcer extends CoreEnforcer
             $this->buildIncrementalRoleLinks(Policy::POLICY_ADD, $ptype, $newRules);
         }
 
-        if ($this->watcher !== null && $this->autoNotifyWatcher) {
+        if (null !== $this->watcher && $this->autoNotifyWatcher) {
             try {
                 if ($this->watcher instanceof WatcherUpdatable) {
                     $this->watcher->updateForUpdatePolicies($oldRules, $newRules);
@@ -178,7 +163,8 @@ class InternalEnforcer extends CoreEnforcer
                     $this->watcher->update();
                 }
             } catch (\Exception $e) {
-                Log::logPrint("An exception occurred:" . $e->getMessage());
+                Log::logPrint('An exception occurred:' . $e->getMessage());
+
                 return false;
             }
         }
@@ -188,12 +174,6 @@ class InternalEnforcer extends CoreEnforcer
 
     /**
      * Removes a rule from the current policy.
-     *
-     * @param string $sec
-     * @param string $ptype
-     * @param array $rule
-     *
-     * @return bool
      */
     protected function removePolicyInternal(string $sec, string $ptype, array $rule): bool
     {
@@ -205,15 +185,16 @@ class InternalEnforcer extends CoreEnforcer
         }
 
         $ruleRemoved = $this->model->removePolicy($sec, $ptype, $rule);
+
         if (!$ruleRemoved) {
             return false;
         }
 
-        if ($sec == "g") {
+        if ('g' == $sec) {
             $this->buildIncrementalRoleLinks(Policy::POLICY_REMOVE, $ptype, [$rule]);
         }
 
-        if ($this->watcher !== null && $this->autoNotifyWatcher) {
+        if (null !== $this->watcher && $this->autoNotifyWatcher) {
             if ($this->watcher instanceof WatcherEx) {
                 $this->watcher->updateForRemovePolicy($sec, $ptype, ...$rule);
             } else {
@@ -226,12 +207,6 @@ class InternalEnforcer extends CoreEnforcer
 
     /**
      * Removes a rules from the current policy.
-     *
-     * @param string $sec
-     * @param string $ptype
-     * @param array $rules
-     *
-     * @return bool
      */
     protected function removePoliciesInternal(string $sec, string $ptype, array $rules): bool
     {
@@ -247,15 +222,16 @@ class InternalEnforcer extends CoreEnforcer
         }
 
         $ruleRemoved = $this->model->removePolicies($sec, $ptype, $rules);
+
         if (!$ruleRemoved) {
             return false;
         }
 
-        if ($sec == "g") {
+        if ('g' == $sec) {
             $this->buildIncrementalRoleLinks(Policy::POLICY_REMOVE, $ptype, $rules);
         }
 
-        if ($this->watcher !== null && $this->autoNotifyWatcher) {
+        if (null !== $this->watcher && $this->autoNotifyWatcher) {
             // error intentionally ignored
             $this->watcher->update();
         }
@@ -265,13 +241,6 @@ class InternalEnforcer extends CoreEnforcer
 
     /**
      * Removes rules based on field filters from the current policy.
-     *
-     * @param string $sec
-     * @param string $ptype
-     * @param int $fieldIndex
-     * @param string ...$fieldValues
-     *
-     * @return bool
      */
     protected function removeFilteredPolicyInternal(string $sec, string $ptype, int $fieldIndex, string ...$fieldValues): bool
     {
@@ -283,15 +252,16 @@ class InternalEnforcer extends CoreEnforcer
         }
 
         $ruleRemoved = $this->model->removeFilteredPolicy($sec, $ptype, $fieldIndex, ...$fieldValues);
+
         if (!$ruleRemoved) {
             return false;
         }
 
-        if ($sec == "g") {
+        if ('g' == $sec) {
             $this->buildIncrementalRoleLinks(Policy::POLICY_REMOVE, $ptype, $ruleRemoved);
         }
 
-        if ($this->watcher !== null && $this->autoNotifyWatcher) {
+        if (null !== $this->watcher && $this->autoNotifyWatcher) {
             // error intentionally ignored
             if ($this->watcher instanceof WatcherEx) {
                 $this->watcher->updateForRemoveFilteredPolicy($sec, $ptype, $fieldIndex, ...$fieldValues);
@@ -306,6 +276,7 @@ class InternalEnforcer extends CoreEnforcer
     protected function updateFilteredPoliciesInternal(string $sec, string $ptype, array $newRules, int $fieldIndex, string ...$fieldValues): bool
     {
         $oldRules = [];
+
         if ($this->shouldPersist()) {
             try {
                 if ($this->adapter instanceof UpdatableAdapter) {
@@ -318,47 +289,48 @@ class InternalEnforcer extends CoreEnforcer
         $ruleChanged = $this->model->removePolicies($sec, $ptype, $oldRules);
         $this->model->addPolicies($sec, $ptype, $newRules);
 
-        $ruleChanged = $ruleChanged && count($newRules) !== 0;
+        $ruleChanged = $ruleChanged && 0 !== count($newRules);
+
         if (!$ruleChanged) {
             return $ruleChanged;
         }
-    
-        if ($sec == "g") {
+
+        if ('g' == $sec) {
             // remove the old rules
             $this->buildIncrementalRoleLinks(Policy::POLICY_REMOVE, $ptype, $oldRules);
             // add the new rules
             $this->buildIncrementalRoleLinks(Policy::POLICY_ADD, $ptype, $newRules);
         }
-    
-        if ($this->watcher !== null && $this->autoNotifyWatcher) {
+
+        if (null !== $this->watcher && $this->autoNotifyWatcher) {
             // error intentionally ignored
             if ($this->watcher instanceof WatcherUpdatable) {
                 $this->watcher->updateForUpdatePolicies($oldRules, $newRules);
             } else {
                 $this->watcher->update();
             }
+
             return $ruleChanged;
         }
-    
+
         return $ruleChanged;
     }
 
     /**
-     * Undocumented function
-     *
-     * @param string $ptype
-     * @return int
+     * Undocumented function.
      */
     protected function getDomainIndex(string $ptype): int
     {
         $p = $this->model['p'][$ptype];
-        $pattern = sprintf("%s_dom", $ptype);
+        $pattern = sprintf('%s_dom', $ptype);
         $index = count($p->tokens);
 
         $tempIndex = array_search($pattern, $p->tokens);
-        if ($tempIndex !== false) {
+
+        if (false !== $tempIndex) {
             $index = intval($tempIndex);
         }
+
         return $index;
     }
 }

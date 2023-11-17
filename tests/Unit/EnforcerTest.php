@@ -12,12 +12,14 @@ use Casbin\Persist\Adapters\FileAdapter;
  * EnforcerTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class EnforcerTest extends TestCase
 {
     private $modelAndPolicyPath = __DIR__ . '/../../examples';
 
-    public function testGetRolesForUser()
+    public function testGetRolesForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $this->assertEquals($e->getRolesForUser('alice'), ['data2_admin']);
@@ -37,13 +39,13 @@ class EnforcerTest extends TestCase
         $this->assertEquals([], $e->getRolesForUser('non_exist', 'domain2'));
     }
 
-    public function testGetUsersForRole()
+    public function testGetUsersForRole(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $this->assertEquals($e->getUsersForRole('data2_admin'), ['alice']);
     }
 
-    public function testHasRoleForUser()
+    public function testHasRoleForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $this->assertTrue($e->hasRoleForUser('alice', 'data2_admin'));
@@ -54,7 +56,7 @@ class EnforcerTest extends TestCase
         $this->assertFalse($e->hasRoleForUser('alice', 'admin', 'domain2'));
     }
 
-    public function testAddRoleForUser()
+    public function testAddRoleForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $e->addRoleForUser('alice', 'data1_admin');
@@ -75,22 +77,22 @@ class EnforcerTest extends TestCase
         $this->assertEquals([], $e->getRolesForUser('non_exist', 'domain2'));
     }
 
-    public function testAddRolesForUser()
+    public function testAddRolesForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
-        $e->addRolesForUser('alice', ["data1_admin", "data2_admin", "data3_admin"]);
+        $e->addRolesForUser('alice', ['data1_admin', 'data2_admin', 'data3_admin']);
         // The "alice" already has "data2_admin" , it will be return false. So "alice" just has "data2_admin".
-        $this->assertEquals(["data2_admin"], $e->getRolesForUser('alice'));
+        $this->assertEquals(['data2_admin'], $e->getRolesForUser('alice'));
 
         $e->deleteRoleForUser('alice', 'data2_admin');
-        $e->addRolesForUser('alice', ["data1_admin", "data2_admin", "data3_admin"]);
-        $this->assertEquals(["data1_admin", "data2_admin", "data3_admin"], $e->getRolesForUser('alice'));
+        $e->addRolesForUser('alice', ['data1_admin', 'data2_admin', 'data3_admin']);
+        $this->assertEquals(['data1_admin', 'data2_admin', 'data3_admin'], $e->getRolesForUser('alice'));
         $this->assertTrue($e->enforce('alice', 'data1', 'read'));
         $this->assertTrue($e->enforce('alice', 'data2', 'read'));
         $this->assertTrue($e->enforce('alice', 'data2', 'write'));
     }
 
-    public function testDeleteRoleForUser()
+    public function testDeleteRoleForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $e->addRoleForUser('alice', 'data1_admin');
@@ -110,14 +112,14 @@ class EnforcerTest extends TestCase
         $this->assertTrue($e->hasRoleForUser('bob', 'admin', 'domain1'));
     }
 
-    public function testDeleteRolesForUser()
+    public function testDeleteRolesForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $e->deleteRolesForUser('alice');
         $this->assertEquals($e->getRolesForUser('alice'), []);
     }
 
-    public function testDeleteRolesForUserInDomain()
+    public function testDeleteRolesForUserInDomain(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domains_model.conf', $this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');
 
@@ -135,7 +137,7 @@ class EnforcerTest extends TestCase
         $this->assertEquals($e->getRolesForUser('bob', 'domain1'), []);
     }
 
-    public function testDeleteUser()
+    public function testDeleteUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $this->assertTrue($e->hasPolicy('alice', 'data1', 'read'));
@@ -146,7 +148,7 @@ class EnforcerTest extends TestCase
         $this->assertEquals($e->getRolesForUser('alice'), []);
     }
 
-    public function testDeleteRole()
+    public function testDeleteRole(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_policy.csv');
         $e->deleteRole('data2_admin');
@@ -160,7 +162,7 @@ class EnforcerTest extends TestCase
         $this->assertTrue($e->enforce('bob', 'data2', 'write'));
     }
 
-    public function testDeletePermission()
+    public function testDeletePermission(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_without_resources_model.conf', $this->modelAndPolicyPath . '/basic_without_resources_policy.csv');
         $e->deletePermission('read');
@@ -170,7 +172,7 @@ class EnforcerTest extends TestCase
         $this->assertTrue($e->enforce('bob', 'write'));
     }
 
-    public function testAddPermissionForUser()
+    public function testAddPermissionForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_without_resources_model.conf', $this->modelAndPolicyPath . '/basic_without_resources_policy.csv');
         $e->deletePermission('read');
@@ -179,7 +181,7 @@ class EnforcerTest extends TestCase
         $this->assertTrue($e->enforce('bob', 'write'));
     }
 
-    public function testAddPermissionsForUser()
+    public function testAddPermissionsForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_without_resources_model.conf', $this->modelAndPolicyPath . '/basic_without_resources_policy.csv');
         $e->addPermissionsForUser('jack', ['read'], ['write']);
@@ -187,7 +189,7 @@ class EnforcerTest extends TestCase
         $this->assertTrue($e->enforce('jack', 'write'));
     }
 
-    public function testDeletePermissionForUser()
+    public function testDeletePermissionForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_without_resources_model.conf', $this->modelAndPolicyPath . '/basic_without_resources_policy.csv');
         $e->addPermissionForUser('bob', 'read');
@@ -198,7 +200,7 @@ class EnforcerTest extends TestCase
         $this->assertTrue($e->enforce('bob', 'write'));
     }
 
-    public function testDeletePermissionsForUser()
+    public function testDeletePermissionsForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_without_resources_model.conf', $this->modelAndPolicyPath . '/basic_without_resources_policy.csv');
         $e->deletePermissionsForUser('bob');
@@ -207,13 +209,13 @@ class EnforcerTest extends TestCase
         $this->assertFalse($e->enforce('bob', 'write'));
     }
 
-    public function testGetPermissionsForUser()
+    public function testGetPermissionsForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_without_resources_model.conf', $this->modelAndPolicyPath . '/basic_without_resources_policy.csv');
         $this->assertEquals($e->getPermissionsForUser('alice'), [['alice', 'read']]);
     }
 
-    public function testHasPermissionForUser()
+    public function testHasPermissionForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_without_resources_model.conf', $this->modelAndPolicyPath . '/basic_without_resources_policy.csv');
         $this->assertTrue($e->hasPermissionForUser('alice', ...['read']));
@@ -222,7 +224,7 @@ class EnforcerTest extends TestCase
         $this->assertTrue($e->hasPermissionForUser('bob', ...['write']));
     }
 
-    public function testGetImplicitRolesForUser()
+    public function testGetImplicitRolesForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_with_hierarchy_policy.csv');
 
@@ -238,6 +240,7 @@ class EnforcerTest extends TestCase
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_pattern_model.conf', $this->modelAndPolicyPath . '/rbac_with_pattern_policy.csv');
 
         $roleManager = $e->getRoleManager();
+
         if ($roleManager instanceof RoleManager) {
             $roleManager->addMatchingFunc('matcher', function (string $key1, string $key2) {
                 return BuiltinOperations::keyMatch($key1, $key2);
@@ -247,33 +250,33 @@ class EnforcerTest extends TestCase
         $this->assertEquals($e->getImplicitRolesForUser('cathy'), ['/book/1/2/3/4/5', 'pen_admin']);
         $this->assertEquals($e->getRolesForUser('cathy'), ['/book/1/2/3/4/5', 'pen_admin']);
     }
-    
-    public function testGetImplicitResourcesForUser()
+
+    public function testGetImplicitResourcesForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_pattern_model.conf', $this->modelAndPolicyPath . '/rbac_with_pattern_policy.csv');
         $this->assertEqualsCanonicalizing([
-            ["alice", "/pen/1", "GET"],
-            ["alice", "/pen2/1", "GET"],
-            ["alice", "/book/:id", "GET"],
-            ["alice", "/book2/{id}", "GET"],
-            ["alice", "/book/*", "GET"],
-            ["alice", "book_group", "GET"],
+            ['alice', '/pen/1', 'GET'],
+            ['alice', '/pen2/1', 'GET'],
+            ['alice', '/book/:id', 'GET'],
+            ['alice', '/book2/{id}', 'GET'],
+            ['alice', '/book/*', 'GET'],
+            ['alice', 'book_group', 'GET'],
         ], $e->getImplicitResourcesForUser('alice'));
 
         $this->assertEqualsCanonicalizing([
-            ["bob", "pen_group", "GET"],
-            ["bob", "/pen/:id", "GET"],
-            ["bob", "/pen2/{id}", "GET"],
+            ['bob', 'pen_group', 'GET'],
+            ['bob', '/pen/:id', 'GET'],
+            ['bob', '/pen2/{id}', 'GET'],
         ], $e->getImplicitResourcesForUser('bob'));
 
         $this->assertEqualsCanonicalizing([
-            ["cathy", "pen_group", "GET"],
-            ["cathy", "/pen/:id", "GET"],
-            ["cathy", "/pen2/{id}", "GET"],
+            ['cathy', 'pen_group', 'GET'],
+            ['cathy', '/pen/:id', 'GET'],
+            ['cathy', '/pen2/{id}', 'GET'],
         ], $e->getImplicitResourcesForUser('cathy'));
     }
 
-    public function testImplicitUsersForRole()
+    public function testImplicitUsersForRole(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_pattern_model.conf', $this->modelAndPolicyPath . '/rbac_with_pattern_policy.csv');
 
@@ -283,7 +286,7 @@ class EnforcerTest extends TestCase
         $this->assertEqualsCanonicalizing(['/pen/:id', '/pen2/{id}'], $e->getImplicitUsersForRole('pen_group'));
     }
 
-    public function testGetImplicitPermissionsForUser()
+    public function testGetImplicitPermissionsForUser(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_with_hierarchy_policy.csv');
         $this->assertEquals($e->getImplicitPermissionsForUser('alice'), [
@@ -305,7 +308,7 @@ class EnforcerTest extends TestCase
         ]);
     }
 
-    public function testGetImplicitUsersForPermission()
+    public function testGetImplicitUsersForPermission(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_model.conf', $this->modelAndPolicyPath . '/rbac_with_hierarchy_policy.csv');
         $this->assertEquals($e->getImplicitUsersForPermission('data1', 'read'), ['alice']);
@@ -314,7 +317,7 @@ class EnforcerTest extends TestCase
         $this->assertEquals($e->getImplicitUsersForPermission('data2', 'write'), ['alice', 'bob']);
     }
 
-    public function testGetUsersForRoleInDomain()
+    public function testGetUsersForRoleInDomain(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domains_model.conf', $this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');
 
@@ -334,7 +337,7 @@ class EnforcerTest extends TestCase
         $this->assertEquals($e->getUsersForRoleInDomain('non_exist', 'domain2'), []);
     }
 
-    public function testGetRolesForUserInDomain()
+    public function testGetRolesForUserInDomain(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domains_model.conf', $this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');
 
@@ -362,7 +365,7 @@ class EnforcerTest extends TestCase
         $this->assertEquals($e->getRolesForUserInDomain('non_exist', 'domain2'), []);
     }
 
-    public function testGetPermissionsForUserInDomain()
+    public function testGetPermissionsForUserInDomain(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domains_model.conf', $this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');
 
@@ -377,7 +380,7 @@ class EnforcerTest extends TestCase
         $this->assertEquals($e->getPermissionsForUserInDomain('non_exist', 'domain2'), []);
     }
 
-    public function testGetAllUsersByDomain()
+    public function testGetAllUsersByDomain(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domains_model.conf', $this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');
 
@@ -385,7 +388,7 @@ class EnforcerTest extends TestCase
         $this->assertEquals(['bob', 'admin'], $e->getAllUsersByDomain('domain2'));
     }
 
-    public function testFailedToLoadPolicy()
+    public function testFailedToLoadPolicy(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_pattern_model.conf', $this->modelAndPolicyPath . '/rbac_with_pattern_policy.csv');
         $e->addNamedMatchingFunc('g2', 'matchingFunc', function (string $key1, string $key2) {
@@ -399,7 +402,7 @@ class EnforcerTest extends TestCase
         $this->assertTrue($e->enforce('alice', '/pen2/1', 'GET'));
     }
 
-    public function testReloadPolicyWithFunc()
+    public function testReloadPolicyWithFunc(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_pattern_model.conf', $this->modelAndPolicyPath . '/rbac_with_pattern_policy.csv');
         $e->addNamedMatchingFunc('g2', 'matchingFunc', function (string $key1, string $key2) {
@@ -412,43 +415,43 @@ class EnforcerTest extends TestCase
         $this->assertTrue($e->enforce('alice', '/pen2/1', 'GET'));
     }
 
-    public function testBatchEnforce()
+    public function testBatchEnforce(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/basic_model.conf', $this->modelAndPolicyPath . '/basic_policy.csv');
 
         $res = $e->batchEnforce([
             ['alice', 'data1', 'read'],
             ['bob', 'data2', 'write'],
-            ['jack', 'data3', 'read']
+            ['jack', 'data3', 'read'],
         ]);
         $this->assertEquals([true, true, false], $res);
     }
 
-    public function testSubjectPriority()
+    public function testSubjectPriority(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/subject_priority_model.conf', $this->modelAndPolicyPath . '/subject_priority_policy.csv');
         $this->assertTrue($e->enforce('jane', 'data1', 'read'));
         $this->assertTrue($e->enforce('alice', 'data1', 'read'));
     }
 
-    public function testSubjectPriorityWithDomain()
+    public function testSubjectPriorityWithDomain(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/subject_priority_model_with_domain.conf', $this->modelAndPolicyPath . '/subject_priority_policy_with_domain.csv');
         $this->assertTrue($e->enforce('alice', 'data1', 'domain1', 'write'));
         $this->assertTrue($e->enforce('bob', 'data2', 'domain2', 'write'));
     }
 
-    public function testDeleteAllUsersByDomain()
+    public function testDeleteAllUsersByDomain(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domains_model.conf', $this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');
-    
+
         $e->deleteAllUsersByDomain('domain1');
         $this->assertEquals([
             ['admin', 'domain2', 'data2', 'read'],
             ['admin', 'domain2', 'data2', 'write'],
         ], $e->getPolicy());
         $this->assertEquals([
-            ['bob', 'admin', 'domain2']
+            ['bob', 'admin', 'domain2'],
         ], $e->getGroupingPolicy());
 
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domains_model.conf', $this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');
@@ -458,11 +461,11 @@ class EnforcerTest extends TestCase
             ['admin', 'domain1', 'data1', 'write'],
         ], $e->getPolicy());
         $this->assertEquals([
-            ['alice', 'admin', 'domain1']
+            ['alice', 'admin', 'domain1'],
         ], $e->getGroupingPolicy());
     }
 
-    public function testDeleteDomains()
+    public function testDeleteDomains(): void
     {
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domains_model.conf', $this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');
 
@@ -478,7 +481,7 @@ class EnforcerTest extends TestCase
             ['admin', 'domain2', 'data2', 'write'],
         ], $e->getPolicy());
         $this->assertEquals([
-            ['bob', 'admin', 'domain2']
+            ['bob', 'admin', 'domain2'],
         ], $e->getGroupingPolicy());
 
         $e = new Enforcer($this->modelAndPolicyPath . '/rbac_with_domains_model.conf', $this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');

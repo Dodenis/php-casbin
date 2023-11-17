@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Casbin\Model;
 
 use Casbin\Util\BuiltinOperations;
-use Closure;
 
 /**
  * Class FunctionMap.
@@ -15,24 +14,17 @@ use Closure;
 class FunctionMap
 {
     /**
-     * @var array<string, Closure>
+     * @var array<string, \Closure>
      */
     private $functions = [];
 
-    /**
-     * @param string $name
-     * @param Closure $func
-     */
-    public function addFunction(string $name, Closure $func): void
+    public function addFunction(string $name, \Closure $func): void
     {
-
         $this->functions[$name] = $func;
     }
 
     /**
      * Loads an initial function map.
-     *
-     * @return FunctionMap
      */
     public static function loadFunctionMap(): self
     {
@@ -72,9 +64,6 @@ class FunctionMap
         return $fm;
     }
 
-    /**
-     * @return array
-     */
     public function getFunctions(): array
     {
         return $this->functions;

@@ -31,7 +31,8 @@
         "phpunit/phpunit": "~7.0|~8.0|~9.0",
         "php-coveralls/php-coveralls": "^2.1",
         "phpstan/phpstan": "^1.2",
-        "mockery/mockery": "^1.2"
+        "mockery/mockery": "^1.2",
+        "friendsofphp/php-cs-fixer": "^3.38"
     },
     "autoload-dev": {
         "psr-4": {
@@ -41,6 +42,8 @@
     "scripts": {
         "test": "./vendor/bin/phpunit -v --testsuite test",
         "benchmark": "./vendor/bin/phpunit -v --no-coverage --testsuite benchmark",
-        "analyse": "./vendor/bin/phpstan analyse"
+        "analyse": "./vendor/bin/phpstan analyse",
+        "cs-fixer": "./vendor/bin/php-cs-fixer fix --using-cache=no --verbose --diff --allow-risky=yes --dry-run",
+        "cs-fixer-apply": "./vendor/bin/php-cs-fixer fix --using-cache=no --verbose --diff --allow-risky=yes "
     }
 }

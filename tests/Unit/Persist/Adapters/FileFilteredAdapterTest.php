@@ -12,12 +12,14 @@ use PHPUnit\Framework\TestCase;
  * FileFilteredAdapterTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class FileFilteredAdapterTest extends TestCase
 {
     private $modelAndPolicyPath = __DIR__ . '/../../../../examples';
 
-    public function testFileFilteredPolicy()
+    public function testFileFilteredPolicy(): void
     {
         $adapter = new FileFilteredAdapter($this->modelAndPolicyPath . '/rbac_with_domains_policy.csv');
         $this->assertTrue($adapter->isFiltered());

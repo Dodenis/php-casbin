@@ -13,15 +13,11 @@ interface Logger
 {
     /**
      * Controls whether print the message.
-     *
-     * @param bool $enable
      */
     public function enableLog(bool $enable): void;
 
     /**
      * Returns if logger is enabled.
-     *
-     * @return bool
      */
     public function isEnabled(): bool;
 
@@ -35,8 +31,7 @@ interface Logger
     /**
      * Formats according to a format specifier and logs the message.
      *
-     * @param string $format
-     * @param mixed  ...$v
+     * @param mixed ...$v
      */
     public function writef(string $format, ...$v): void;
 }

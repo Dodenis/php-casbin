@@ -10,10 +10,12 @@ use Casbin\Log\Logger\DefaultLogger;
  * LogTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class LogTest extends TestCase
 {
-    public function testLog()
+    public function testLog(): void
     {
         $logger = new DefaultLogger();
         Log::setLogger($logger);

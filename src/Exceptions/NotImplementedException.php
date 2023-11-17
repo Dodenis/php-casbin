@@ -9,6 +9,4 @@ namespace Casbin\Exceptions;
  *
  * @author techlee@qq.com
  */
-class NotImplementedException extends CasbinException
-{
-}
+class NotImplementedException extends CasbinException {}

@@ -17,8 +17,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * Gets the roles that a user has.
      *
-     * @param string $name
-     * @param string ...$domain
      * @return string[]
      */
     public function getRolesForUser(string $name, string ...$domain): array
@@ -29,9 +27,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * Gets the users that has a role.
      *
-     * @param string $name
-     * @param string ...$domain
-     *
      * @return string[]
      */
     public function getUsersForRole(string $name, string ...$domain): array
@@ -41,12 +36,6 @@ class Enforcer extends ManagementEnforcer
 
     /**
      * Determines whether a user has a role.
-     *
-     * @param string $name
-     * @param string $role
-     * @param string ...$domain
-     *
-     * @return bool
      */
     public function hasRoleForUser(string $name, string $role, string ...$domain): bool
     {
@@ -58,11 +47,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * Adds a role for a user.
      * returns false if the user already has the role (aka not affected).
-     *
-     * @param string $user
-     * @param string $role
-     * @param string ...$domain
-     * @return bool
      */
     public function addRoleForUser(string $user, string $role, string ...$domain): bool
     {
@@ -70,11 +54,7 @@ class Enforcer extends ManagementEnforcer
     }
 
     /**
-     * @param string $user
      * @param string[] $roles
-     * @param string ...$domain
-     *
-     * @return bool
      */
     public function addRolesForUser(string $user, array $roles, string ...$domain): bool
     {
@@ -88,12 +68,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * Deletes a role for a user.
      * returns false if the user does not have the role (aka not affected).
-     *
-     * @param string $user
-     * @param string $role
-     * @param string ...$domain
-     *
-     * @return bool
      */
     public function deleteRoleForUser(string $user, string $role, string ...$domain): bool
     {
@@ -104,10 +78,6 @@ class Enforcer extends ManagementEnforcer
      * Deletes all roles for a user.
      * Returns false if the user does not have any roles (aka not affected).
      *
-     * @param string $user
-     * @param string ...$domain
-     *
-     * @return bool
      * @throws CasbinException
      */
     public function deleteRolesForUser(string $user, string ...$domain): bool
@@ -122,10 +92,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * Deletes a user.
      * Returns false if the user does not exist (aka not affected).
-     *
-     * @param string $user
-     *
-     * @return bool
      */
     public function deleteUser(string $user): bool
     {
@@ -137,9 +103,6 @@ class Enforcer extends ManagementEnforcer
 
     /**
      * Deletes a role.
-     *
-     * @param string $role
-     * @return bool
      */
     public function deleteRole(string $role): bool
     {
@@ -152,10 +115,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * Deletes a permission.
      * Returns false if the permission does not exist (aka not affected).
-     *
-     * @param string ...$permission
-     *
-     * @return bool
      */
     public function deletePermission(string ...$permission): bool
     {
@@ -165,11 +124,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * Adds a permission for a user or role.
      * Returns false if the user or role already has the permission (aka not affected).
-     *
-     * @param string $user
-     * @param string ...$permission
-     *
-     * @return bool
      */
     public function addPermissionForUser(string $user, string ...$permission): bool
     {
@@ -181,28 +135,21 @@ class Enforcer extends ManagementEnforcer
     /**
      * AddPermissionsForUser adds multiple permissions for a user or role.
      * Returns false if the user or role already has one of the permissions (aka not affected).
-     *
-     * @param string $user
-     * @param array  ...$permissions
-     * @return bool
      */
     public function addPermissionsForUser(string $user, array ...$permissions): bool
     {
         $rules = [];
+
         foreach ($permissions as $permission) {
             $rules[] = array_merge([$user], $permission);
         }
+
         return $this->addPolicies($rules);
     }
 
     /**
      * Deletes a permission for a user or role.
      * Returns false if the user or role does not have the permission (aka not affected).
-     *
-     * @param string $user
-     * @param string ...$permission
-     *
-     * @return bool
      */
     public function deletePermissionForUser(string $user, string ...$permission): bool
     {
@@ -214,10 +161,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * Deletes permissions for a user or role.
      * Returns false if the user or role does not have any permissions (aka not affected).
-     *
-     * @param string $user
-     *
-     * @return bool
      */
     public function deletePermissionsForUser(string $user): bool
     {
@@ -226,37 +169,31 @@ class Enforcer extends ManagementEnforcer
 
     /**
      * Gets permissions for a user or role.
-     *
-     * @param string $user
-     * @param string ...$domain
-     *
-     * @return array
      */
     public function getPermissionsForUser(string $user, string ...$domain): array
     {
         $permission = [];
+
         foreach ($this->model['p'] as $ptype => $assertion) {
             $args = [];
             $args[0] = $user;
+
             foreach ($assertion->tokens as $i => $token) {
                 if ($token == sprintf('%s_dom', $ptype)) {
                     $args[$i] = $domain[0];
+
                     break;
                 }
             }
             $perm = $this->getFilteredPolicy(0, ...$args);
             $permission = array_merge($permission, $perm);
         }
+
         return $permission;
     }
 
     /**
      * Determines whether a user has a permission.
-     *
-     * @param string $user
-     * @param string ...$permission
-     *
-     * @return bool
      */
     public function hasPermissionForUser(string $user, string ...$permission): bool
     {
@@ -274,11 +211,6 @@ class Enforcer extends ManagementEnforcer
      *
      * getRolesForUser("alice") can only get: ["role:admin"].
      * But getImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
-     *
-     * @param string $name
-     * @param string ...$domain
-     *
-     * @return array
      */
     public function getImplicitRolesForUser(string $name, string ...$domain): array
     {
@@ -295,6 +227,7 @@ class Enforcer extends ManagementEnforcer
 
             foreach ($this->rmMap as $rm) {
                 $roles = $rm->getRoles($name, ...$domain);
+
                 foreach ($roles as $r) {
                     if (!isset($roleSet[$r])) {
                         $res[] = $r;
@@ -310,10 +243,6 @@ class Enforcer extends ManagementEnforcer
 
     /**
      * GetImplicitUsersForRole gets implicit users for a role.
-     *
-     * @param string $name
-     * @param string ...$domain
-     * @return array
      */
     public function getImplicitUsersForRole(string $name, string ...$domain): array
     {
@@ -330,6 +259,7 @@ class Enforcer extends ManagementEnforcer
 
             foreach ($this->rmMap as $rm) {
                 $roles = $rm->getUsers($name, ...$domain);
+
                 foreach ($roles as $r) {
                     if (!isset($roleSet[$r])) {
                         $res[] = $r;
@@ -339,37 +269,38 @@ class Enforcer extends ManagementEnforcer
                 }
             }
         }
+
         return $res;
     }
 
     /**
-     * GetImplicitResourcesForUser returns all policies that user obtaining in domain
-     *
-     * @param string $user
-     * @param string ...$domain
-     * @return array
+     * GetImplicitResourcesForUser returns all policies that user obtaining in domain.
      */
     public function getImplicitResourcesForUser(string $user, string ...$domain): array
     {
         $permissions = $this->getImplicitPermissionsForUser($user, ...$domain);
-        
+
         $res = [];
+
         foreach ($permissions as $permission) {
             if ($permission[0] == $user) {
                 $res[] = $permission;
+
                 continue;
             }
             $resLocal = [[$user]];
             $tokensLength = count($permission);
             $t = [[]];
+
             foreach (array_slice($permission, 1) as $token) {
                 $tokens = $this->getImplicitUsersForRole($token, ...$domain);
                 $tokens[] = $token;
                 $t[] = $tokens;
             }
 
-            for ($i = 1; $i < $tokensLength; $i++) {
+            for ($i = 1; $i < $tokensLength; ++$i) {
                 $n = [];
+
                 foreach ($t[$i] as $tokens) {
                     foreach ($resLocal as $policy) {
                         $temp = [];
@@ -382,6 +313,7 @@ class Enforcer extends ManagementEnforcer
             }
             $res = array_merge($res, $resLocal);
         }
+
         return $res;
     }
 
@@ -396,10 +328,6 @@ class Enforcer extends ManagementEnforcer
      * getPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
      * But getImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
      *
-     * @param string $user
-     * @param string ...$domain
-     *
-     * @return array
      * @throws CasbinException
      */
     public function getImplicitPermissionsForUser(string $user, string ...$domain): array
@@ -410,11 +338,13 @@ class Enforcer extends ManagementEnforcer
         );
 
         $len = \count($domain);
+
         if ($len > 1) {
             throw new CasbinException('error: domain should be 1 parameter');
         }
 
         $res = [];
+
         foreach ($roles as $role) {
             if (1 == $len) {
                 $permissions = $this->getPermissionsForUserInDomain($role, $domain[0]);
@@ -437,16 +367,13 @@ class Enforcer extends ManagementEnforcer
      * getImplicitUsersForPermission("data1", "read") will get: ["alice", "bob"].
      * Note: only users will be returned, roles (2nd arg in "g") will be excluded.
      *
-     * @param string ...$permission
-     *
-     * @return array
      * @throws CasbinException
      */
     public function getImplicitUsersForPermission(string ...$permission): array
     {
         $pSubjects = $this->getAllSubjects();
-        $gInherit = $this->model->getValuesForFieldInPolicyAllTypes("g", 1);
-        $gSubjects = $this->model->getValuesForFieldInPolicyAllTypes("g", 0);
+        $gInherit = $this->model->getValuesForFieldInPolicyAllTypes('g', 1);
+        $gSubjects = $this->model->getValuesForFieldInPolicyAllTypes('g', 0);
 
         $subjects = array_merge($pSubjects, $gSubjects);
         Util::ArrayRemoveDuplicates($subjects);
@@ -454,6 +381,7 @@ class Enforcer extends ManagementEnforcer
         $subjects = array_diff($subjects, $gInherit);
 
         $res = [];
+
         foreach ($subjects as $user) {
             $req = $permission;
             array_unshift($req, $user);
@@ -470,7 +398,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * GetAllUsersByDomain would get all users associated with the domain.
      *
-     * @param string $domain
      * @return string[]
      */
     public function getAllUsersByDomain(string $domain): array
@@ -482,32 +409,30 @@ class Enforcer extends ManagementEnforcer
         $index = $this->getDomainIndex('p');
 
         $getUser = function (int $index, array $policies, string $domain, array $m): array {
-            if (count($policies) == 0 || count($policies[0]) <= $index) {
+            if (0 == count($policies) || count($policies[0]) <= $index) {
                 return [];
             }
             $res = [];
+
             foreach ($policies as $policy) {
                 $ok = isset($m[$policy[0]]);
+
                 if ($policy[$index] == $domain && !$ok) {
                     $res[] = $policy[0];
                     $m[$policy[0]] = [];
                 }
             }
+
             return $res;
         };
 
         $users = array_merge($users, $getUser(2, $g->policy, $domain, $m));
-        $users = array_merge($users, $getUser($index, $p->policy, $domain, $m));
-        return $users;
+
+        return array_merge($users, $getUser($index, $p->policy, $domain, $m));
     }
 
     /**
      * Gets the users that has a role inside a domain. Add by Gordon.
-     *
-     * @param string $name
-     * @param string $domain
-     *
-     * @return array
      */
     public function getUsersForRoleInDomain(string $name, string $domain): array
     {
@@ -516,11 +441,6 @@ class Enforcer extends ManagementEnforcer
 
     /**
      * Gets the roles that a user has inside a domain.
-     *
-     * @param string $name
-     * @param string $domain
-     *
-     * @return array
      */
     public function getRolesForUserInDomain(string $name, string $domain): array
     {
@@ -529,11 +449,6 @@ class Enforcer extends ManagementEnforcer
 
     /**
      * Gets permissions for a user or role inside a domain.
-     *
-     * @param string $name
-     * @param string $domain
-     *
-     * @return array
      */
     public function getPermissionsForUserInDomain(string $name, string $domain): array
     {
@@ -543,12 +458,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * Adds a role for a user inside a domain.
      * returns false if the user already has the role (aka not affected).
-     *
-     * @param string $user
-     * @param string $role
-     * @param string $domain
-     *
-     * @return bool
      */
     public function addRoleForUserInDomain(string $user, string $role, string $domain): bool
     {
@@ -558,12 +467,6 @@ class Enforcer extends ManagementEnforcer
     /**
      * Deletes a role for a user inside a domain.
      * Returns false if the user does not have the role (aka not affected).
-     *
-     * @param string $user
-     * @param string $role
-     * @param string $domain
-     *
-     * @return bool
      */
     public function deleteRoleForUserInDomain(string $user, string $role, string $domain): bool
     {
@@ -573,17 +476,13 @@ class Enforcer extends ManagementEnforcer
     /**
      * DeleteRolesForUserInDomain deletes all roles for a user inside a domain.
      * Returns false if the user does not have any roles (aka not affected).
-     *
-     * @param string $user
-     * @param string $domain
-     *
-     * @return bool
      */
     public function deleteRolesForUserInDomain(string $user, string $domain): bool
     {
         $roles = $this->model['g']['g']->rm->getRoles($user, $domain);
 
         $rules = [];
+
         foreach ($roles as $role) {
             $rules[] = [$user, $role, $domain];
         }
@@ -593,9 +492,6 @@ class Enforcer extends ManagementEnforcer
 
     /**
      * DeleteAllUsersByDomain would delete all users associated with the domain.
-     *
-     * @param string $domain
-     * @return bool
      */
     public function deleteAllUsersByDomain(string $domain): bool
     {
@@ -604,15 +500,17 @@ class Enforcer extends ManagementEnforcer
         $index = $this->getDomainIndex('p');
 
         $getUser = function (int $index, array $policies, string $domain): array {
-            if (count($policies) == 0 || count($policies[0]) <= $index) {
+            if (0 == count($policies) || count($policies[0]) <= $index) {
                 return [];
             }
             $res = [];
+
             foreach ($policies as $policy) {
                 if ($policy[$index] == $domain) {
                     $res[] = $policy;
                 }
             }
+
             return $res;
         };
 
@@ -620,25 +518,26 @@ class Enforcer extends ManagementEnforcer
         $this->removeGroupingPolicies($users);
         $users = $getUser($index, $p->policy, $domain);
         $this->removePolicies($users);
+
         return true;
     }
 
     /**
      * DeleteDomains would delete all associated users and roles.
      * It would delete all domains if parameter is not provided.
-     *
-     * @param string ...$domains
-     * @return bool
      */
     public function deleteDomains(string ...$domains): bool
     {
-        if (count($domains) == 0) {
+        if (0 == count($domains)) {
             $this->clearPolicy();
+
             return true;
         }
+
         foreach ($domains as $domain) {
             $this->deleteAllUsersByDomain($domain);
         }
+
         return true;
     }
 }

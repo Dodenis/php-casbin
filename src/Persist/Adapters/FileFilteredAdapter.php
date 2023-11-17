@@ -28,8 +28,6 @@ class FileFilteredAdapter extends FileAdapter implements FilteredAdapter
 
     /**
      * FileAdapter constructor.
-     *
-     * @param string $filePath
      */
     public function __construct(string $filePath)
     {
@@ -39,8 +37,6 @@ class FileFilteredAdapter extends FileAdapter implements FilteredAdapter
 
     /**
      * Loads all policy rules from the storage.
-     *
-     * @param Model $model
      *
      * @throws CasbinException
      */
@@ -53,7 +49,6 @@ class FileFilteredAdapter extends FileAdapter implements FilteredAdapter
     /**
      * Loads only policy rules that match the filter.
      *
-     * @param Model $model
      * @param mixed $filter
      *
      * @throws CasbinException
@@ -80,8 +75,6 @@ class FileFilteredAdapter extends FileAdapter implements FilteredAdapter
 
     /**
      * Returns true if the loaded policy has been filtered.
-     *
-     * @return bool
      */
     public function isFiltered(): bool
     {
@@ -91,7 +84,6 @@ class FileFilteredAdapter extends FileAdapter implements FilteredAdapter
     /**
      * SavePolicy saves all policy rules to the storage.
      *
-     * @param Model $model
      * @throws CannotSaveFilteredPolicy|CasbinException
      */
     public function savePolicy(Model $model): void
@@ -106,9 +98,6 @@ class FileFilteredAdapter extends FileAdapter implements FilteredAdapter
     /**
      * LoadFilteredPolicyFile function.
      *
-     * @param Model $model
-     * @param Filter $filter
-     * @param callable $handler
      * @throws InvalidFilePathException
      */
     protected function loadFilteredPolicyFile(Model $model, Filter $filter, callable $handler): void
@@ -121,6 +110,7 @@ class FileFilteredAdapter extends FileAdapter implements FilteredAdapter
 
         while ($line = fgets($file)) {
             $line = trim($line);
+
             if (self::filterLine($line, $filter)) {
                 continue;
             }
@@ -130,20 +120,17 @@ class FileFilteredAdapter extends FileAdapter implements FilteredAdapter
 
     /**
      * FilterLine function.
-     *
-     * @param string $line
-     * @param Filter $filter
-     *
-     * @return bool
      */
     protected static function filterLine(string $line, Filter $filter): bool
     {
         $p = explode(',', $line);
+
         if (0 == strlen($p[0])) {
             return true;
         }
 
         $filterSlice = [];
+
         switch (trim($p[0])) {
             case 'p':
                 $filterSlice = $filter->p;
@@ -160,11 +147,6 @@ class FileFilteredAdapter extends FileAdapter implements FilteredAdapter
 
     /**
      * FilterWords function.
-     *
-     * @param array $line
-     * @param array $filter
-     *
-     * @return bool
      */
     protected static function filterWords(array $line, array $filter): bool
     {
@@ -172,6 +154,7 @@ class FileFilteredAdapter extends FileAdapter implements FilteredAdapter
             return true;
         }
         $skipLine = false;
+
         foreach ($filter as $i => $v) {
             if (strlen($v) > 0 && \trim($v) != trim($line[$i + 1])) {
                 $skipLine = true;

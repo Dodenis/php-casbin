@@ -9,6 +9,4 @@ namespace Casbin\Exceptions;
  *
  * @author techlee@qq.com
  */
-class InvalidFilePathException extends CasbinException
-{
-}
+class InvalidFilePathException extends CasbinException {}

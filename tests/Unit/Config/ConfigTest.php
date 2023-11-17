@@ -10,22 +10,25 @@ use PHPUnit\Framework\TestCase;
  * ConfigTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class ConfigTest extends TestCase
 {
-    public function testNewConfig()
+    public function testNewConfig(): void
     {
         $cfg = Config::newConfig(__DIR__ . '/test.ini');
         $this->getAndSetConfig($cfg);
     }
 
-    public function testNewConfigFromText()
+    public function testNewConfigFromText(): void
     {
         $cfg = Config::newConfigFromText(file_get_contents(__DIR__ . '/test.ini'));
         $this->getAndSetConfig($cfg);
 
         try {
-            $cfg = Config::newConfigFromText(<<<'EOT'
+            $cfg = Config::newConfigFromText(
+                <<<'EOT'
 [mysql]
 mysql.dev.host = 127.0.0.1
 mysql.dev.user
@@ -36,7 +39,7 @@ EOT
         }
     }
 
-    private function getAndSetConfig(Config $cfg)
+    private function getAndSetConfig(Config $cfg): void
     {
         // $cfg = Config::newConfigFromText(file_get_contents(__DIR__.'/test.ini'));
         $this->assertEquals('act.wiki', $cfg->getString('url'));

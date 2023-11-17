@@ -9,6 +9,4 @@ namespace Casbin\Exceptions;
  *
  * @author techlee@qq.com
  */
-class InvalidFilterTypeException extends CasbinException
-{
-}
+class InvalidFilterTypeException extends CasbinException {}

@@ -9,6 +9,4 @@ namespace Casbin\Exceptions;
  *
  * @author 1115610574@qq.com
  */
-class BatchOperationException extends CasbinException
-{
-}
+class BatchOperationException extends CasbinException {}

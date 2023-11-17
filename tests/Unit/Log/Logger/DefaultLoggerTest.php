@@ -9,10 +9,12 @@ use Casbin\Log\Logger\DefaultLogger;
  * DefaultLoggerTest.
  *
  * @author techlee@qq.com
+ *
+ * @internal
  */
 class DefaultLoggerTest extends TestCase
 {
-    public function testDefaultLogger()
+    public function testDefaultLogger(): void
     {
         $logger = new DefaultLogger();
 
