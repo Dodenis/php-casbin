@@ -668,6 +668,14 @@ class CoreEnforcer
                 }
 
                 $parameters = array_merge($rParameters, $parameters);
+
+                $reqStr = 'Evaluate expression: '.$expression;
+                Log::logPrint($reqStr);
+
+                $reqStr = 'Evaluate parameters: ';
+                $reqStr .= json_encode($parameters, JSON_THROW_ON_ERROR);
+                Log::logPrint($reqStr);
+
                 $result = $expressionLanguage->evaluate($expression, $parameters);
 
                 // set to no-match at first
@@ -737,6 +745,7 @@ class CoreEnforcer
             $reqStr .= implode(', ', array_values($rvals));
 
             $reqStr .= sprintf(" ---> %s\n", var_export($result, true));
+            Log::logPrint($reqStr);
 
             $reqStr = 'Hit Policy: ';
             if (count($explains) == count($explains, COUNT_RECURSIVE)) {

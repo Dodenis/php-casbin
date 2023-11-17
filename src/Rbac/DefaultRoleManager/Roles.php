@@ -43,6 +43,7 @@ class Roles
     public function &createRole(string $name): Role
     {
         $role = &$this->loadOrStore($name, new Role($name));
+
         return $role;
     }
 

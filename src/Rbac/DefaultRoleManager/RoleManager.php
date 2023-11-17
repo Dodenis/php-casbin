@@ -207,19 +207,22 @@ class RoleManager implements RoleManagerContract
      */
     public function hasLink(string $name1, string $name2, string ...$domain): bool
     {
+        Log::logPrintf('hasLink: %s, %s, %s', $name1, $name2, '['.implode(',', $domain).']');
         if (count($domain) > 1) {
             throw new CasbinException('error: domain should be 1 parameter');
         }
         $domain = count($domain) == 0 ? [self::DEFAULT_DOMAIN] : $domain;
 
         if ($name1 == $name2) {
+            Log::logPrint('---> TRUE 1');
             return true;
         }
 
         $patternDomain = $this->getPatternDomain($domain[0]);
-
+        Log::logPrint('PatternDomaine: '.json_encode($patternDomain));
         foreach ($patternDomain as $domain) {
-            $allRoles = &$this->loadOrStoreRoles($domain, new Roles());
+            $allRoles = &$this->getAllRolesForDomain($domain);
+
             if (!$allRoles->hasRole($name1, $this->matchingFunc) || !$allRoles->hasRole($name2, $this->matchingFunc)) {
                 continue;
             }
@@ -234,6 +237,7 @@ class RoleManager implements RoleManagerContract
                     }
                 }
                 if ($flag) {
+                    Log::logPrint('---> TRUE 2');
                     return true;
                 }
                 continue;
@@ -241,11 +245,13 @@ class RoleManager implements RoleManagerContract
             $role1 = &$allRoles->createRole($name1);
             $result = $role1->hasRole($name2, $this->maxHierarchyLevel);
             if ($result) {
+                Log::logPrint('---> TRUE 3');
                 return true;
             }
             continue;
         }
 
+        Log::logPrint('---> FALSE');
         return false;
     }
 
@@ -350,5 +356,105 @@ class RoleManager implements RoleManagerContract
         }
 
         return $this->allDomains[$domain];
+    }
+
+    /**
+     * @param string $domain
+     *
+     * @return Roles
+     */
+    protected function &getAllRolesForDomain(string $domain): Roles
+    {
+        if ($this->hasDomainPattern || $this->hasPattern) {
+            $allRoles = &$this->generateTempRoles($domain);
+        } else {
+            $allRoles = &$this->loadOrStoreRoles($domain, new Roles());
+        }
+
+        return $allRoles;
+    }
+
+    /**
+     * @param string $domain
+     *
+     * @return Roles
+     */
+    protected function &generateTempRoles(string $domain): Roles
+    {
+        $this->loadOrStoreRoles($domain, new Roles());
+
+        $patternDomain = $this->getMatchedDomains($domain);
+
+        $allRoles = new Roles();
+
+        foreach ($patternDomain as $domain) {
+            $roles = $this->loadOrStoreRoles($domain, new Roles());
+            foreach ($roles->toArray() as $key => $role2) {
+                $role1 = &$allRoles->createRole($role2->name, $this->matchingFunc);
+                foreach ($role2->getRoles() as $name) {
+                    $role3 = &$allRoles->createRole($name, $this->matchingFunc);
+                    $role1->addRole($role3);
+                }
+            }
+        }
+
+        return $allRoles;
+    }
+
+    private function getMatchedDomains(string $domain): array
+    {
+        $patternDomain = [$domain];
+
+        if ($this->hasDomainPattern) {
+            $patternDomain = array_merge(
+                $patternDomain,
+                $this->findMatchingDomains($domain)
+            );
+        }
+
+        return $patternDomain;
+    }
+
+    private function findMatchingDomains(string $domain): array
+    {
+        $domainMatchingFunc = $this->domainMatchingFunc;
+
+        return array_keys(array_filter(
+            $this->allDomains,
+            static function($key) use ($domain, $domainMatchingFunc) {
+                return $domainMatchingFunc($domain, $key);
+            },
+            ARRAY_FILTER_USE_KEY
+        ));
+    }
+
+    private function aggregateRolesFromDomains(array $domains): Roles
+    {
+        $aggregatedRoles = new Roles();
+
+        foreach ($domains as $domain) {
+            $this->addRolesFromDomainToAggregate($domain, $aggregatedRoles);
+        }
+
+        return $aggregatedRoles;
+    }
+
+    private function addRolesFromDomainToAggregate(string $domain, Roles &$aggregatedRoles): void
+    {
+        $roles = $this->loadOrStoreRoles($domain, new Roles());
+
+        foreach ($roles->toArray() as $role) {
+            $this->addRoleWithDependencies($role, $aggregatedRoles);
+        }
+    }
+
+    private function addRoleWithDependencies(Role $role, Roles &$aggregatedRoles): void
+    {
+        $aggregatedRole = &$aggregatedRoles->createRole($role->name);
+
+        foreach ($role->getRoles() as $associatedRoleName) {
+            $associatedRole = &$aggregatedRoles->createRole($associatedRoleName);
+            $aggregatedRole->addRole($associatedRole);
+        }
     }
 }
